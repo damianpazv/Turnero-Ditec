@@ -17,6 +17,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred';
 import TuneIcon from '@mui/icons-material/Tune';
 import HomeIcon from "@mui/icons-material/Home";
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
@@ -120,6 +121,13 @@ export default function ListaPrueba() {
           <HomeIcon />
         </ListItemIcon>
         <ListItemText primary="INICIO" />
+      </ListItemButton>
+
+      <ListItemButton onClick={() => redirigir("/turnos")} component="a" className="w-100">
+        <ListItemIcon>
+          <AssignmentTurnedInIcon />
+        </ListItemIcon>
+        <ListItemText primary="TURNOS" />
       </ListItemButton>
       
       {/* Construye cada elemento del menú */}
