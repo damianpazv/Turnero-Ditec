@@ -177,7 +177,7 @@ console.log(error);
       return Swal.fire({
           icon: 'error',
           title: '¡Ups!',
-          text: 'El DNI no puede ser negativo',   
+          text: 'El CUIL no puede ser negativo',   
           confirmButtonColor:"#6495ED"              
         })
   }
@@ -219,7 +219,7 @@ EditarCiudadanoDB(formData)
           <div className="px-2">
             <p className="datoUsuario">Nombre/s:</p> <p>{usuario.nombre_persona}</p>
             <p className="datoUsuario">Apellidos:</p> <p>{usuario.apellido_persona}</p>
-            <p className="datoUsuario">DNI:</p> <p>{usuario.documento_persona}</p>
+            <p className="datoUsuario">CUIL:</p> <p>{usuario.documento_persona}</p>
             <p className="datoUsuario">Fecha nacimiento:</p> <p>{usuario.fecha_nacimiento_persona.split('T')[0] }</p>
             <p className="datoUsuario">Localidad:</p> <p> {usuario.localidad_persona}</p>
             <p className="datoUsuario">Domicilio:</p> <p> {usuario.domicilio_persona}</p>
