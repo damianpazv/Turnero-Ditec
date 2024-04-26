@@ -1,17 +1,30 @@
-import { Button, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import axios from '../../config/axios';
 import useStore from '../../Zustand/Zustand';
+import "./Turnos.css"
 
 const Turnos = () => {
 
   const { user, authenticated, loading } = useStore();
-  console.log(user);
-  const [values, setValues] = useState({dni:"",descripcion:"",tramite:""});
+ 
   const [tramites , setTramites] = useState([])
+  const [existeTurno , setExisteTurno] = useState(null)
+  const [turnosPorDia, setTurnosPorDia] = useState([]);
+  const [turnosPorHora, setTurnosPorHora] = useState([]);
 
-  const handleChange = (e) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
+  const [flag , setFlag] = useState(false)
+  const [error, setError] = useState("");
+  
+  const [minDate , setMinDate] = useState("")
+  const [maxDate , setMaxDate] = useState("")
+  const [fechasDeshabilitadas,setFechasDeshabilitadas] = useState([]);
+  
+  const [values, setValues] = useState({dni:"",descripcion:"",tramite:"",fecha: ""});
+
+  const handleChangeSelect = (e) => {
+    setValues({ ...values, [e.target.name]: e.target.value, fecha:"" });
+    
   };
 
   const obtenerTramites = async ()=>{
@@ -33,9 +46,12 @@ const Turnos = () => {
     // setFormFlagReclamos(false);
     e.preventDefault();
     try {
+      setFlag(true);
       // setFlagButton(true);
-      const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}`);
-     console.log(resultado);
+      const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
+     console.log(resultado.data[0][0] == 0);
+     setExisteTurno(resultado.data[0][0] == 0 ? false : true)
+
       // setFormFlagReclamos(false)
       // setFlagButton(false);
     } catch (error) {
@@ -44,6 +60,116 @@ const Turnos = () => {
     }
     // setFormFlagReclamos(true);
   };
+
+  const obtenerTurnosPorDia = async (e) => {
+    // setFormFlagReclamos(false);
+    // e.preventDefault();
+    try {
+      // setFlagButton(true);
+      const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorDia?id_tramite=${values.tramite}`);
+      console.log(resultado);
+      setTurnosPorDia(resultado.data)
+      setExisteTurno(null)
+      if(resultado.data.length == 0){
+        setError("El trámite ingresado no tiene turnos disponibles")
+        setFlag(false)
+      }
+      const fechasOrdenadas = resultado.data.map(fecha => new Date(fecha.dia_turno));
+      const fechaMinima = new Date(Math.min(...fechasOrdenadas));
+      const fechaMaxima = new Date(Math.max(...fechasOrdenadas));
+
+      // Formatea las fechas para establecer el valor de los atributos min y max del input
+      const minDate = fechaMinima.toISOString().split('T')[0];
+      const maxDate = fechaMaxima.toISOString().split('T')[0];
+
+      setValues({...values,fecha:minDate})
+      setMinDate(minDate);
+      setMaxDate(maxDate);
+
+      console.log(minDate);
+      console.log(maxDate);
+
+      
+      
+      const fechasConFormatoCorrecto = resultado.data.map(item => item.dia_turno.split('T')[0]);
+
+      console.log(fechasConFormatoCorrecto);
+      const fechasDeshabilitadas = ["2024-04-27", "2024-04-28"];
+      setFechasDeshabilitadas(fechasConFormatoCorrecto);
+      // setFormFlagReclamos(false)
+      // setFlagButton(false);
+    } catch (error) {
+      console.log(error);
+      console.log("mal");
+      // setErrorPermiso(error.response.data?.message || error.message)
+    }
+    // setFormFlagReclamos(true);
+  };
+
+  useEffect(() => {
+   if(existeTurno == false){
+    obtenerTurnosPorDia();
+    // setExisteTurno(null)
+   }
+   console.log("holka");
+  }, [existeTurno])
+
+  const eliminarDuplicados = (array) => {
+    return array.filter((elem, index, self) => {
+        return index === self.findIndex((t) => (
+            t.hora_turno === elem.hora_turno
+        ));
+    });
+};
+
+  const obtenerTurnosPorHora = async (e) => {
+    try {
+      const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorHora?id_tramite=${values.tramite}&fecha_solicitada=${values.fecha}`);
+      console.log(resultado);
+      setTurnosPorHora(eliminarDuplicados(resultado.data));
+      if(resultado.data.length == 0){
+        setError("No hay turnos disponibles para la fecha ingresada")
+      }
+      setFlag(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleInputChange = (e) => {
+
+    // const { name, value } = e.target;
+    //   setValues({
+    //     ...values,
+    //     [name]: value,
+    //   });
+
+    const { name, value } = e.target;
+    console.log(value);
+    console.log(turnosPorDia);
+    if (fechasDeshabilitadas.includes(value)) {
+      setValues({ ...values, [name]: value });
+     
+    }else{
+      setError("No hay turnos disponibles para la fecha ingresada")
+    }
+  };
+
+  useEffect(() => {
+    if(values.fecha != ""){
+      setFlag(true)
+      setTurnosPorHora([])
+     obtenerTurnosPorHora();
+    //  setExisteTurno(null)
+    }
+    console.log("chau");
+   }, [values])
+
+
+   const handleCloseSnackbar = () => {
+    setError("");
+  };
+
 
   return (
     <div className='container mt-5'>
@@ -57,7 +183,7 @@ const Turnos = () => {
               <div className='col-md-6'>
                 <div className="d-flex flex-column my-2">
                   <TextField
-                    disabled
+                    readOnly
                     className='mb-3'
                     // eslint-disable-next-line react/prop-types
                     value={user.nombre_persona}
@@ -68,10 +194,10 @@ const Turnos = () => {
                     inputProps={{ maxLength: 20 }}
                   />
                   <TextField
-                    disabled
+                    readOnly
                     // eslint-disable-next-line react/prop-types
                     value={user.apellido_persona}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     label="Apellido"
                     type="text"
                     name="apellido"
@@ -83,11 +209,11 @@ const Turnos = () => {
                     }}
                   />
                   <TextField
-                    disabled
+                    readOnly
                     // eslint-disable-next-line react/prop-types
                     className='my-3'
                     value={user.domicilio_persona}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     label="Domicilio"
                     type="text"
                     name="descripcion"
@@ -105,11 +231,11 @@ const Turnos = () => {
                 <div className="d-flex flex-column my-2">
 
                   <TextField
-                    disabled
+                    readOnly
                     className='mb-3'
                     // eslint-disable-next-line react/prop-types
                     value={user.telefono_persona}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     label="Teléfono"
                     type="text"
                     name="descripcion"
@@ -121,7 +247,7 @@ const Turnos = () => {
                     }}
                   />
                   <TextField
-                    disabled
+                    readOnly
                     className='mb-3'
                     // eslint-disable-next-line react/prop-types
                     value={user.documento_persona}
@@ -130,12 +256,12 @@ const Turnos = () => {
                       const numericValue = e.target.value.replace(/\D/g, "");
 
                       // Actualiza el estado solo si la entrada es numérica
-                      handleChange({
-                        target: {
-                          name: "dni",
-                          value: numericValue,
-                        },
-                      });
+                      // handleChange({
+                      //   target: {
+                      //     name: "dni",
+                      //     value: numericValue,
+                      //   },
+                      // });
                     }}
                     label="DNI"
                     type="text"
@@ -149,10 +275,10 @@ const Turnos = () => {
                     }}
                   />
                   <TextField
-                    disabled
+                    readOnly
                     // eslint-disable-next-line react/prop-types
                     value={user.email_persona}
-                    onChange={handleChange}
+                    // onChange={handleChange}
                     label="Email"
                     type="text"
                     name="descripcion"
@@ -173,12 +299,12 @@ const Turnos = () => {
                 <Select
                   // eslint-disable-next-line react/prop-types
                   value={values.tramite}
-                  onChange={handleChange}
+                  onChange={handleChangeSelect}
                   name="tramite"
                   required
-                  disabled={tramites.length === 0}
+                  disabled={tramites.length === 0 && flag}
                   className="mt-2"
-                  label="Trámite"
+                  // label="Trámite"
                   style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
                 >
                   {tramites.length > 0 &&
@@ -188,11 +314,56 @@ const Turnos = () => {
                       </MenuItem>
                     ))}
                 </Select>
+                {
+                  turnosPorDia.length && !flag > 0 && values.fecha != ""?
+                    <>
+                      <TextField
+                        label="Fecha"
+                        type="date"
+                        className='mt-3'
+                        disabled={flag}
+                        value={values.fecha}
+                        name="fecha"
+                        onChange={handleInputChange}
+                        InputLabelProps={{
+                          shrink: true,
+                        }}
+                        inputProps={{
+                          min: minDate,
+                          max: maxDate
+                        }}
+                      />
+                      {
+                       turnosPorHora.length>0 && turnosPorHora.map((t, index) => (
+                          <li key={index} >
+                            {t.hora_turno}
+                          </li>
+                        ))
+                      }
+                    </>
+                    : flag &&
+                    <Box className="d-flex justify-content-center mt-3">
+                      <CircularProgress />
+                    </Box>
+                   
+                }
+           
               </div>
             </div>
-            <Button className='my-3' type='submit' variant="outlined">Solicitar Turno</Button>
+            <Button disabled={flag} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
           </form>
         </div>
+        {
+          error != "" &&
+          <Snackbar
+          open={error != "" ? true : false}
+          autoHideDuration={5000000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "center", horizontal: "center" }} // Ajusta la posición del Snackbar
+        >
+          <Alert severity="warning">{error}</Alert>
+        </Snackbar>
+        }
       </div>
     </div>
 
