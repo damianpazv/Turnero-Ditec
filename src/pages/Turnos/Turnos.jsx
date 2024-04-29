@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import axios from '../../config/axios';
 import useStore from '../../Zustand/Zustand';
 import "./Turnos.css"
+import DatePickerComponent from './Fechas';
 
 const Turnos = () => {
 
@@ -18,14 +19,21 @@ const Turnos = () => {
   
   const [minDate , setMinDate] = useState("")
   const [maxDate , setMaxDate] = useState("")
-  const [fechasDeshabilitadas,setFechasDeshabilitadas] = useState([]);
+  const [fechasHabilitadas,setFechasHabilitadas] = useState([]);
   
   const [values, setValues] = useState({dni:"",descripcion:"",tramite:"",fecha: ""});
 
   const handleChangeSelect = (e) => {
+    console.log(e.target);
     setValues({ ...values, [e.target.name]: e.target.value, fecha:"" });
-    
+    console.log(e.target.value);
   };
+
+  const handleChangeSelectHora = (e)=>{
+   
+    setValues({ ...values, [e.target.name]: e.target.value, fecha:"" });
+    console.log(e.target.value);
+  }
 
   const obtenerTramites = async ()=>{
     try {
@@ -94,8 +102,8 @@ const Turnos = () => {
       const fechasConFormatoCorrecto = resultado.data.map(item => item.dia_turno.split('T')[0]);
 
       console.log(fechasConFormatoCorrecto);
-      const fechasDeshabilitadas = ["2024-04-27", "2024-04-28"];
-      setFechasDeshabilitadas(fechasConFormatoCorrecto);
+      const fechasHabilitadas = ["2024-04-27", "2024-04-28"];
+      setFechasHabilitadas(fechasConFormatoCorrecto);
       // setFormFlagReclamos(false)
       // setFlagButton(false);
     } catch (error) {
@@ -147,7 +155,7 @@ const Turnos = () => {
     const { name, value } = e.target;
     console.log(value);
     console.log(turnosPorDia);
-    if (fechasDeshabilitadas.includes(value)) {
+    if (fechasHabilitadas.includes(value)) {
       setValues({ ...values, [name]: value });
      
     }else{
@@ -161,6 +169,8 @@ const Turnos = () => {
       setTurnosPorHora([])
      obtenerTurnosPorHora();
     //  setExisteTurno(null)
+    }else{
+      //logica al seleccionar la hora
     }
     console.log("chau");
    }, [values])
@@ -263,7 +273,7 @@ const Turnos = () => {
                       //   },
                       // });
                     }}
-                    label="DNI"
+                    label="CUIL"
                     type="text"
                     name="dni"
                     InputLabelProps={{
@@ -294,7 +304,7 @@ const Turnos = () => {
               </div>
             </div>
             <div className='row mb-2'>
-              <div className='col-md-6'>
+              <div className='col-md-4'>
                 <InputLabel className='text-black'>Trámites disponibles</InputLabel>
                 <Select
                   // eslint-disable-next-line react/prop-types
@@ -314,13 +324,23 @@ const Turnos = () => {
                       </MenuItem>
                     ))}
                 </Select>
+                
+                
+                <Button disabled={flag} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
+              </div>
+
+                <div className='col-md-4'>
                 {
                   turnosPorDia.length && !flag > 0 && values.fecha != ""?
                     <>
-                      <TextField
+                      <InputLabel className='text-black'>Fechas disponibles</InputLabel>
+                      
+                        <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values = {values} setValues = {setValues}/>
+                      
+                      {/* <TextField
                         label="Fecha"
                         type="date"
-                        className='mt-3'
+                        className='mt-2'
                         disabled={flag}
                         value={values.fecha}
                         name="fecha"
@@ -332,26 +352,64 @@ const Turnos = () => {
                           min: minDate,
                           max: maxDate
                         }}
-                      />
-                      {
+                        style={{ width: '100%' }}
+                      /> */}
+                  
+                    </>
+                    : flag &&
+                    <Box className="d-flex justify-content-center mt-5">
+                      <CircularProgress />
+                    </Box>
+                   
+                }
+                </div>
+
+                
+                <div className='col-md-4'>
+                {
+                  turnosPorDia.length && !flag > 0 && values.fecha != ""?
+                    <>
+                      <InputLabel className='text-black'>Horas disponibles</InputLabel>
+                      {/* {
                        turnosPorHora.length>0 && turnosPorHora.map((t, index) => (
                           <li key={index} >
                             {t.hora_turno}
                           </li>
                         ))
-                      }
+                      } */}
+
+                      <Select
+                        // eslint-disable-next-line react/prop-types
+                        value={values.hora}
+                        onChange={handleChangeSelectHora}
+                        name="hora"
+                        required
+                        disabled={tramites.length === 0 && flag}
+                        className="mt-2"
+                        // label="Trámite"
+                        style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
+                      >
+                        {turnosPorHora.length>0 && turnosPorHora.map((st, index) => (
+                            <MenuItem key={index} value={st.hora_turno}>
+                              {st.hora_turno}
+                            </MenuItem>
+                          ))}
+                      </Select>
+
                     </>
                     : flag &&
-                    <Box className="d-flex justify-content-center mt-3">
+                    <Box className="d-flex justify-content-center mt-5">
                       <CircularProgress />
                     </Box>
                    
                 }
            
-              </div>
+                </div>
+             
             </div>
-            <Button disabled={flag} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
+          
           </form>
+      
         </div>
         {
           error != "" &&
