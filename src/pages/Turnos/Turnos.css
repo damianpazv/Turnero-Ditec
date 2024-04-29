@@ -1,0 +1,10 @@
+.css-to2f46-MuiPaper-root-MuiAlert-root {
+    position: absolute;
+    top: -25vh !important;
+}
+.inputDatePicker{
+    width: 300px;
+    height: 55px;
+    border: 1px solid #C4C4C4;
+    border-radius: 3.5%;
+}
