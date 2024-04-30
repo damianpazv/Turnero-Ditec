@@ -38,7 +38,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
     setDateSelected(date);
     // formatFecha(formatDate(date))
     handleInputChange(formatDate(date) )
-    setValues({ ...values, "fecha": formatDate(date) });
+    setValues({ ...values, "fecha": formatDate(date), hora:"" });
   };
 
   const handleInputClick = () => {

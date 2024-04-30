@@ -17,11 +17,16 @@ const style = {
   p: 4,
 };
 
-export default function ConfirmarTurnoModal({open, setOpen,values}) {
+export default function ConfirmarTurnoModal({open, setOpen,values,confirmarTurno}) {
 //   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-console.log(values);
+
+const confirmarTurnoModal = ()=>{
+  confirmarTurno();
+  handleClose();
+}
+
   return (
     <div>
       {/* <Button onClick={handleOpen}>Open modal</Button> */}
@@ -47,7 +52,7 @@ console.log(values);
           </Typography>
           </div>
           <div className='mt-3'>
-          <Button className='me-5'>Confirmar</Button>
+          <Button onClick={confirmarTurnoModal} className='me-5'>Confirmar</Button>
           <Button onClick={handleClose}>Cancelar</Button>
           </div>
         </Box>
