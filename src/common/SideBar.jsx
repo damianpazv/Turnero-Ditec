@@ -131,7 +131,8 @@ export default function ListaPrueba() {
       </ListItemButton>
       
       {/* Construye cada elemento del menú */}
-      {menuItemsFiltered.map((item, index) => (
+     
+      { false && menuItemsFiltered.map((item, index) => (
         <div key={index} className="d-flex justify-content-between w-100 flex-column">
           {/* Elemento del menú */}
           <ListItemButton onClick={() => handleClick(item.label)} >
@@ -154,6 +155,7 @@ export default function ListaPrueba() {
           )}
         </div>
       ))}
+
     </div>
 
       <div className="d-flex flex-column justify-content-center align-items-center">
