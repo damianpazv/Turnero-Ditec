@@ -26,7 +26,7 @@ const Turnos = () => {
 
   const [tramiteSelected, setTramiteSelected] = useState("")
   const handleChangeSelect = (e) => {
-    console.log(e.target.value);
+
     setTramiteSelected(tramites.find(t=>t.idtramite == e.target.value))
     setValues({ ...values, [e.target.name]: e.target.value, fecha: "" });
   };
@@ -37,7 +37,7 @@ const Turnos = () => {
   const handleChangeSelectHora = (e) => {
 
     setValues({ ...values, [e.target.name]: e.target.value });
-    console.log(e.target.value);
+  
     setOpen(true)
 
   }
@@ -45,7 +45,7 @@ const Turnos = () => {
   const obtenerTramites = async () => {
     try {
       const { data } = await axios.get("/turnos/listarTramites?reparticion_id=1800")
-      console.log(data);
+  
       setTramites(data.tramites)
     } catch (error) {
       console.log(error);
@@ -64,7 +64,6 @@ const Turnos = () => {
     setBandera(true);
     try {
       const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
-      console.log(resultado);
 
       if (resultado.data.length > 0 && resultado.data[0][0] != 0) {
         console.log("ya tengo turno");
@@ -89,7 +88,7 @@ const Turnos = () => {
 
     try {
       const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorDia?id_tramite=${values.tramite}`);
-      console.log(resultado);
+  
       setTurnosPorDia(resultado.data)
 
       if (resultado.data.length == 0) {
@@ -97,7 +96,6 @@ const Turnos = () => {
         setBandera(false);
       }
       const fechasOrdenadas = resultado.data.map(fecha => new Date(fecha.dia_turno));
-      console.log(turnosPorDia);
 
       const fechaMinima = new Date(Math.min(...fechasOrdenadas));
       const fechaMaxima = new Date(Math.max(...fechasOrdenadas));
@@ -110,7 +108,6 @@ const Turnos = () => {
 
       const fechasConFormatoCorrecto = resultado.data.map(item => item.dia_turno.split('T')[0]);
 
-      console.log(fechasConFormatoCorrecto);
       const fechasHabilitadas = ["2024-04-27", "2024-04-28"];
       setFechasHabilitadas(fechasConFormatoCorrecto);
 
@@ -125,7 +122,7 @@ const Turnos = () => {
 
     try {
       const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorHora?id_tramite=${values.tramite}&fecha_solicitada=${fecha}`);
-      console.log(resultado);
+
       setTurnosPorHora(resultado.data);
       if (resultado.data.length == 0) {
         setNotificacion({ mensaje: "No hay turnos disponibles para la fecha ingresada", tipo: "error" });
@@ -139,7 +136,6 @@ const Turnos = () => {
   }
 
   const handleInputChange = (value) => {
-    console.log(value);
     if (value != "") {
       setBandera(true)
       setTurnosPorHora([])
@@ -157,14 +153,14 @@ const Turnos = () => {
   const confirmarTurno = async () => {
     try {
       setBotonState(true);
-      const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora });
-      console.log(Object.values(data)[0]);
+      const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora, email: user.email_persona, nombre_tramite: tramiteSelected.nombre_tramite });
+    
       if (Object.values(data)[0] == 0) {
         setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora", tipo: "error" });
       } else {
 
         setOperacionExitosa(Object.values(data)[0]);
-        setNotificacion({ mensaje: "Turno Confirmado", tipo: "success" });
+        setNotificacion({ mensaje: "Turno Confirmado.\nLe enviamos un email con la información del turno.", tipo: "success" });
       }
     } catch (error) {
       console.log(error);
@@ -176,8 +172,8 @@ const Turnos = () => {
     setBotonState(true)
     try {
       const { data } = await axios.get(`/turnos/anularTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`)
-      console.log(data);
-      setNotificacion({ mensaje: "Turno Anulado", tipo: "success" });
+    
+      setNotificacion({ mensaje: "Turno Cancelado", tipo: "success" });
       setValues({ ...values, fecha: "" });
       setOperacionExitosa(undefined)
     } catch (error) {
@@ -469,11 +465,18 @@ const Turnos = () => {
           notificacion.mensaje != "" &&
           <Snackbar
             open={notificacion.mensaje != "" ? true : false}
-            autoHideDuration={5000}
+            autoHideDuration={6000}
             onClose={handleCloseSnackbar}
-            anchorOrigin={{ vertical: "center", horizontal: "center" }} // Ajusta la posición del Snackbar
+            anchorOrigin={{ vertical: "center", horizontal: "center" }}
           >
-            <Alert className='mjeTurnos' severity={notificacion.tipo}>{notificacion.mensaje}</Alert>
+            <Alert className='mjeTurnos' severity={notificacion.tipo}>
+                {notificacion.mensaje.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Alert>
           </Snackbar>
         }
       </div>

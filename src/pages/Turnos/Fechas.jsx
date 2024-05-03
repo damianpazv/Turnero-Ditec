@@ -11,7 +11,6 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   // Simulación de obtención de fechas disponibles desde la base de datos
   useEffect(() => {
     const data = ["2024-04-29","2024-04-30","2024-07-11"];
-    console.log(fechasHabilitadas);
     const dates = fechasHabilitadas.map(dateString => {
       const [year, month, day] = dateString.split('-');
       // Crear un objeto Date y establecer la hora a medianoche localmente
@@ -32,9 +31,6 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   const [flag,setFlag] = useState(false)
 
   const handleDateChange = date => {
-
-    // Aquí puedes manejar el cambio de fecha como desees
-    console.log(formatDate(date));
     setDateSelected(date);
     // formatFecha(formatDate(date))
     handleInputChange(formatDate(date) )

@@ -9,7 +9,6 @@ const ImprimirTurno = () => {
 
       const location = useLocation();
       const datos = location.state;
-      console.log(datos);
 
       const formatFechaTurno = (fecha) => {
         // Convertir la fecha a un objeto de fecha en JavaScript
