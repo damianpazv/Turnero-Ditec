@@ -18,7 +18,7 @@ const style = {
     p: 4,
 };
 
-export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values }) {
+export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values, imprimirTurno }) {
     //   const [open, setOpen] = React.useState(false);
     //   const handleOpen = () => setOpen(true);
     const handleClose = () => {
@@ -76,7 +76,7 @@ export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, 
                     </div>
                     <div className='mt-3'>
                         <Button onClick={ handleClose } className='me-3'>Cancelar Turno</Button>
-                        <Button className='me-3'>Reimprimir</Button>
+                        <Button onClick={imprimirTurno} className='me-3'>Reimprimir</Button>
 
                     </div>
                 </Box>

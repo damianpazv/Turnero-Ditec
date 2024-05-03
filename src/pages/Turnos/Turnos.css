@@ -22,8 +22,3 @@
     justify-content: space-around;
     
 }
-
-.textAreaObs{
-    resize: none;
-    overflow-y: scroll;
-}

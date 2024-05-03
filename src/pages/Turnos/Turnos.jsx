@@ -1,4 +1,4 @@
-import { Alert, Box, Button, CircularProgress, InputLabel, MenuItem, Select, Snackbar, TextField, TextareaAutosize } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, InputLabel, MenuItem, Select, Skeleton, Snackbar, TextField, TextareaAutosize } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import axios from '../../config/axios';
 import useStore from '../../Zustand/Zustand';
@@ -6,6 +6,8 @@ import "./Turnos.css"
 import DatePickerComponent from './Fechas';
 import ConfirmarTurnoModal from './ConfirmarTurnoModal';
 import AnularTurnoModal from './AnularTurnoModal';
+import ObservacionesTramitesTextArea from './ObservacionesTramite';
+import { useNavigate } from 'react-router-dom';
 
 const Turnos = () => {
 
@@ -24,8 +26,8 @@ const Turnos = () => {
 
   const [tramiteSelected, setTramiteSelected] = useState("")
   const handleChangeSelect = (e) => {
-    console.log(tramites.find(t=>t.idtramite == values.tramite));
-    setTramiteSelected(tramites.find(t=>t.idtramite == values.tramite))
+    console.log(e.target.value);
+    setTramiteSelected(tramites.find(t=>t.idtramite == e.target.value))
     setValues({ ...values, [e.target.name]: e.target.value, fecha: "" });
   };
 
@@ -154,7 +156,7 @@ const Turnos = () => {
 
   const confirmarTurno = async () => {
     try {
-
+      setBotonState(true);
       const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora });
       console.log(Object.values(data)[0]);
       if (Object.values(data)[0] == 0) {
@@ -167,6 +169,7 @@ const Turnos = () => {
     } catch (error) {
       console.log(error);
     }
+      setBotonState(false);
   }
 
   const anularTurno = async () => {
@@ -188,6 +191,13 @@ const Turnos = () => {
     setValues({ ...values, fecha: "" });
     setOperacionExitosa(undefined)
     setBotonState(false)
+  }
+
+  const navigate = useNavigate()
+
+  const imprimirTurno = () => {
+  const props = { user: user, values: values, tramite:tramiteSelected };
+  navigate("/imprimirTurno",{state:props})
   }
 
   return (
@@ -328,7 +338,7 @@ const Turnos = () => {
                   />
                   <div className='btnTurno'> 
 
-                    <Button className='my-3' variant="outlined">Imprimir Turno</Button>
+                    <Button onClick={imprimirTurno} disabled={botonState} className='my-3' variant="outlined">Imprimir Turno</Button>
                     <Button onClick={anularTurno} disabled={botonState} className='my-3 ' variant="outlined">Cancelar Turno</Button>
                     <Button onClick={nuevoTurno} disabled={botonState} className='my-3 ' variant="outlined">Nuevo Turno</Button>
                   </div>
@@ -360,15 +370,16 @@ const Turnos = () => {
                   </Select>
 
 
-                  <Button disabled={bandera || tramites.length == 0} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
-                  <textarea className='textAreaObs' rows="4" cols="50" readOnly>{console.log(tramiteSelected)}</textarea>
+                  <Button disabled={bandera || tramites.length == 0 || botonState} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
+                  <ObservacionesTramitesTextArea valor={tramiteSelected?.observaciones}/>
+                  
                 </div>
 
                 <div className='col-md-4'>
                   {
                     !bandera && values.fecha != "" ?
                       <>
-                        <InputLabel className='text-black'>Fechas disponibles</InputLabel>
+                        <InputLabel className='text-black ms-md-5 ps-md-2'>Fechas disponibles</InputLabel>
 
                         <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values={values} setValues={setValues} />
 
@@ -392,9 +403,17 @@ const Turnos = () => {
 
                       </>
                       : bandera &&
-                      <Box className="d-flex justify-content-center mt-5">
-                        <CircularProgress />
-                      </Box>
+                      // <Box className="d-flex justify-content-center mt-5">
+                      //   <CircularProgress />
+                      // </Box>
+                      <div className='d-md-flex justify-content-center'>
+
+                        <Box className="mt-3" sx={{ width: 300 }}>
+                          <Skeleton />
+                          <Skeleton animation="wave" />
+                          <Skeleton animation={false} />
+                        </Box>
+                      </div>
 
                   }
                 </div>
@@ -426,10 +445,14 @@ const Turnos = () => {
 
                       </>
                       : bandera &&
-                      <Box className="d-flex justify-content-center mt-5">
-                        <CircularProgress />
+                      // <Box className="d-flex justify-content-center mt-5">
+                      //   <CircularProgress />
+                      // </Box>
+                      <Box className="mt-3" sx={{ width: {xs:300, md:400} }}>
+                        <Skeleton />
+                        <Skeleton animation="wave" />
+                        <Skeleton animation={false} />
                       </Box>
-
                   }
 
                 </div>
@@ -439,7 +462,7 @@ const Turnos = () => {
 
           </form>
           <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} confirmarTurno={confirmarTurno} />
-          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values}/>
+          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno}/>
         </div>
 
         {
