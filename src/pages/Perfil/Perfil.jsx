@@ -22,7 +22,7 @@ const Perfil = () => {
   const { user,updateUser } = useStore();
  // const [confirmarContraseña, setConfirmarContraseña] = useState('');
  const [saveChanges, setSaveChanges] = useState(JSON.parse(localStorage.getItem("saveChanges")) || false);
- console.log(user);
+
   const[formData, setFormData]= useState({
       
     documento_persona:user.documento_persona,
@@ -119,7 +119,6 @@ console.log(error);
           });
 
           actualizarUsuarioConFormData(user, data);
-          console.log(user)
           
           updateUser(user);
            setIsEditing(!isEditing)

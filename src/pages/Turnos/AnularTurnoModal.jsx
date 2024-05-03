@@ -76,7 +76,7 @@ export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, 
                     </div>
                     <div className='mt-3'>
                         <Button onClick={ handleClose } className='me-3'>Cancelar Turno</Button>
-                        <Button onClick={imprimirTurno} className='me-3'>Reimprimir</Button>
+                        <Button onClick={imprimirTurno} className='me-3'>imprimir</Button>
 
                     </div>
                 </Box>
