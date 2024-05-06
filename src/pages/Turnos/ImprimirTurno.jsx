@@ -32,52 +32,59 @@ const ImprimirTurno = () => {
         return fechaFormateada;
 
     }
-
+console.log(nombre);
     return (
-        <div>
-            <div className='cont container-fluid w-100 d-md-none mt-5'>
-                <div className='imprimir'>
-                    <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
-                    <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
+        <>
+        {
+            nombre != null &&
+   <div>
+   <div className='cont container-fluid w-100 d-md-none mt-5'>
+       <div className='imprimir'>
+           <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
+           <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
 
-                    <div className='datosCont mt-4'>
-                        <p>Tipo de Trámite: {tramite}</p>
-                        <div className='datos '>
-                            <p>Día: {fecha.length > 12 ? formatFechaTurno(fecha): fecha}</p>
-                            <p>Hora: {hora}</p>
-                        </div>
+           <div className='datosCont mt-4'>
+               <p>Tipo de Trámite: {tramite}</p>
+               <div className='datos '>
+                   <p>Día: {fecha?.length > 12 ? formatFechaTurno(fecha): fecha}</p>
+                   <p>Hora: {hora}</p>
+               </div>
 
-                        <p className='mt-4'>CUIL: {cuil}</p>
-                        <div className='datos'>
-                            <p>Apellido: {apellido}</p>
-                            <p>Nombre: {nombre}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+               <p className='mt-4'>CUIL: {cuil}</p>
+               <div className='datos'>
+                   <p>Apellido: {apellido}</p>
+                   <p>Nombre: {nombre}</p>
+               </div>
+           </div>
+       </div>
+   </div>
 {/* ESTA DOS VECES PARA MANEJAR EL RESPONSIVE */}
-            <div className='cont container-fluid w-50 d-none d-md-block mt-5'>
-            <div className='imprimir'>
-                    <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
-                    <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
+   <div className='cont container-fluid w-50 d-none d-md-block mt-5'>
+   <div className='imprimir'>
+           <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
+           <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
 
-                    <div className='datosCont mt-4'>
-                        <p>Tipo de Trámite: {tramite}</p>
-                        <div className='datos '>
-                            <p>Día: {fecha.length > 10 ? formatFechaTurno(fecha): fecha}</p>
-                            <p>Hora: {hora}</p>
-                        </div>
+           <div className='datosCont mt-4'>
+               <p>Tipo de Trámite: {tramite}</p>
+               <div className='datos '>
+                   <p>Día: {fecha?.length > 10 ? formatFechaTurno(fecha): fecha}</p>
+                   <p>Hora: {hora}</p>
+               </div>
 
-                        <p className='mt-4'>CUIL: {cuil}</p>
-                        <div className='datos'>
-                            <p>Apellido: {apellido}</p>
-                            <p>Nombre: {nombre}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+               <p className='mt-4'>CUIL: {cuil}</p>
+               <div className='datos'>
+                   <p>Apellido: {apellido}</p>
+                   <p>Nombre: {nombre}</p>
+               </div>
+           </div>
+       </div>
+   </div>
 
-        </div>
+</div>
+
+        }
+        </>
+     
     )
 }
 

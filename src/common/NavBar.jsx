@@ -48,7 +48,7 @@ export default function NavBar() {
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
-              <SideBar />
+              {/* <SideBar /> */}
               <div className="d-flex justify-content-between align-items-center w-100">
                 <img src={logoMuni} className="logoMuni2" />
                 {authenticated && (
