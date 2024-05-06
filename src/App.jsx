@@ -15,6 +15,8 @@ function App() {
   const url = new URL(window.location.href);
   const logout = url.searchParams.get("logout");
 
+  localStorage.setItem("reparticion",1800);
+
   url.searchParams.delete("logout");
   history.replaceState(null, '', url.toString());
 
