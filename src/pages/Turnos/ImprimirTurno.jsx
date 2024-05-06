@@ -8,7 +8,15 @@ const ImprimirTurno = () => {
       }, []);
 
       const location = useLocation();
-      const datos = location.state;
+
+      const searchParams = new URLSearchParams(location.search);
+      const nombre = searchParams.get('nombre');
+      const apellido = searchParams.get('apellido');
+      const cuil = searchParams.get('cuil');
+      const tramite = searchParams.get('tramite');
+      const fecha = searchParams.get('dia');
+      const hora = searchParams.get('hora');
+
 
       const formatFechaTurno = (fecha) => {
         // Convertir la fecha a un objeto de fecha en JavaScript
@@ -24,6 +32,7 @@ const ImprimirTurno = () => {
         return fechaFormateada;
 
     }
+
     return (
         <div>
             <div className='cont container-fluid w-100 d-md-none mt-5'>
@@ -32,37 +41,37 @@ const ImprimirTurno = () => {
                     <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
 
                     <div className='datosCont mt-4'>
-                        <p>Tipo de Trámite: {datos.tramite.nombre_tramite}</p>
+                        <p>Tipo de Trámite: {tramite}</p>
                         <div className='datos '>
-                            <p>Día: {datos.values.fecha ? datos.values.fecha : formatFechaTurno(datos.values.fechaAnularTurno)}</p>
-                            <p>Hora: {datos.values.hora}</p>
+                            <p>Día: {fecha.length > 12 ? formatFechaTurno(fecha): fecha}</p>
+                            <p>Hora: {hora}</p>
                         </div>
 
-                        <p className='mt-4'>CUIL: {datos.user.documento_persona}</p>
+                        <p className='mt-4'>CUIL: {cuil}</p>
                         <div className='datos'>
-                            <p>Apellido: {datos.user.apellido_persona}</p>
-                            <p>Nombre: {datos.user.nombre_persona}</p>
+                            <p>Apellido: {apellido}</p>
+                            <p>Nombre: {nombre}</p>
                         </div>
                     </div>
                 </div>
             </div>
 {/* ESTA DOS VECES PARA MANEJAR EL RESPONSIVE */}
             <div className='cont container-fluid w-50 d-none d-md-block mt-5'>
-                <div className='imprimir'>
+            <div className='imprimir'>
                     <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
                     <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
 
                     <div className='datosCont mt-4'>
-                        <p>Tipo de Trámite: {datos.tramite.nombre_tramite}</p>
+                        <p>Tipo de Trámite: {tramite}</p>
                         <div className='datos '>
-                            <p>Día: {datos.values.fecha?  datos.values.fecha : formatFechaTurno(datos.values.fechaAnularTurno)}</p>
-                            <p>Hora: {datos.values.hora}</p>
+                            <p>Día: {fecha.length > 10 ? formatFechaTurno(fecha): fecha}</p>
+                            <p>Hora: {hora}</p>
                         </div>
 
-                        <p className='mt-4'>CUIL: {datos.user.documento_persona}</p>
+                        <p className='mt-4'>CUIL: {cuil}</p>
                         <div className='datos'>
-                            <p>Apellido: {datos.user.apellido_persona}</p>
-                            <p>Nombre: {datos.user.nombre_persona}</p>
+                            <p>Apellido: {apellido}</p>
+                            <p>Nombre: {nombre}</p>
                         </div>
                     </div>
                 </div>

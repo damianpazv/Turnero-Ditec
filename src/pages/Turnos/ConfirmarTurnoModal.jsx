@@ -17,13 +17,19 @@ const style = {
   p: 4,
 };
 
-export default function ConfirmarTurnoModal({open, setOpen,values,confirmarTurno}) {
+export default function ConfirmarTurnoModal({open, setOpen,values,setValues,confirmarTurno,tramiteSelected,setNotificacion}) {
 //   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
 const confirmarTurnoModal = ()=>{
-  confirmarTurno();
+  if(tramiteSelected.adicionalrequerido == 1 && values.adicional == ""){
+
+    setNotificacion({ mensaje: "Debe ingresar la información solicitada", tipo: "error" });
+    setValues({...values,hora:""});
+  }else{
+    confirmarTurno();
+  }
   handleClose();
 }
 

@@ -8,6 +8,7 @@ import ConfirmarTurnoModal from './ConfirmarTurnoModal';
 import AnularTurnoModal from './AnularTurnoModal';
 import ObservacionesTramitesTextArea from './ObservacionesTramite';
 import { useNavigate } from 'react-router-dom';
+import CampoAdicionalTurno from './CampoAdicionalTurno';
 
 const Turnos = () => {
 
@@ -22,7 +23,7 @@ const Turnos = () => {
 
   const [fechasHabilitadas, setFechasHabilitadas] = useState([]);
 
-  const [values, setValues] = useState({ cuil: "", descripcion: "", tramite: "", fecha: "", hora: "" });
+  const [values, setValues] = useState({ cuil: "", descripcion: "", tramite: "", fecha: "", hora: "", adicional:"" });
 
   const [tramiteSelected, setTramiteSelected] = useState("")
   const handleChangeSelect = (e) => {
@@ -39,12 +40,15 @@ const Turnos = () => {
     setValues({ ...values, [e.target.name]: e.target.value });
   
     setOpen(true)
+  }
 
+  const handleChange = (e) =>{
+    setValues({ ...values, [e.target.name]: e.target.value });
   }
 
   const obtenerTramites = async () => {
     try {
-      const { data } = await axios.get("/turnos/listarTramites?reparticion_id=1800")
+      const { data } = await axios.get(`/turnos/listarTramites?reparticion_id=${localStorage.getItem("reparticion")}`)
   
       setTramites(data.tramites)
     } catch (error) {
@@ -59,26 +63,29 @@ const Turnos = () => {
   const [bandera, setBandera] = useState(false)
 
   const getDataExisteTurno = async (e) => {
-
     e.preventDefault();
-    setBandera(true);
-    try {
-      const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
+    if (values.tramite != "") {
+      setBandera(true);
+      try {
+        const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
 
-      if (resultado.data.length > 0 && resultado.data[0][0] != 0) {
-        console.log("ya tengo turno");
-        setValues({ ...values, [e.target.name]: e.target.value, hora: resultado.data[0].hora_turno, fechaAnularTurno: resultado.data[0].dia_turno});
-        setOpenAnularTurno(true);
-        setBandera(false);
-      } else {
+        if (resultado.data.length > 0 && resultado.data[0][0] != 0) {
+          console.log("ya tengo turno");
+          setValues({ ...values, [e.target.name]: e.target.value, hora: resultado.data[0].hora_turno, fechaAnularTurno: resultado.data[0].dia_turno });
+          setOpenAnularTurno(true);
+          setBandera(false);
+        } else {
 
-        obtenerTurnosPorDia()
+          obtenerTurnosPorDia()
 
+        }
+
+      } catch (error) {
+        console.log("mal");
+        setNotificacion({ mensaje: error.response.data?.message || error.message, tipo: "error" });
       }
-
-    } catch (error) {
-      console.log("mal");
-      setNotificacion({ mensaje: error.response.data?.message || error.message, tipo: "error" });
+    } else {
+      setNotificacion({ mensaje: "Debe seleccionar un trámite", tipo: "error" });
     }
 
   };
@@ -94,6 +101,7 @@ const Turnos = () => {
       if (resultado.data.length == 0) {
         setNotificacion({ mensaje: "El trámite ingresado no tiene turnos disponibles", tipo: "error" });
         setBandera(false);
+        return;
       }
       const fechasOrdenadas = resultado.data.map(fecha => new Date(fecha.dia_turno));
 
@@ -153,7 +161,7 @@ const Turnos = () => {
   const confirmarTurno = async () => {
     try {
       setBotonState(true);
-      const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora, email: user.email_persona, nombre_tramite: tramiteSelected.nombre_tramite });
+      const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora, email: user.email_persona, nombre_tramite: tramiteSelected.nombre_tramite, adicional: values.adicional });
     
       if (Object.values(data)[0] == 0) {
         setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora", tipo: "error" });
@@ -161,6 +169,7 @@ const Turnos = () => {
 
         setOperacionExitosa(Object.values(data)[0]);
         setNotificacion({ mensaje: "Turno Confirmado.\nLe enviamos un email con la información del turno.", tipo: "success" });
+        setValues({ ...values, adicional:"" });
       }
     } catch (error) {
       console.log(error);
@@ -174,7 +183,7 @@ const Turnos = () => {
       const { data } = await axios.get(`/turnos/anularTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`)
     
       setNotificacion({ mensaje: "Turno Cancelado", tipo: "success" });
-      setValues({ ...values, fecha: "" });
+      setValues({ ...values, fecha: "" ,adicional:""});
       setOperacionExitosa(undefined)
     } catch (error) {
       console.log(error);
@@ -192,15 +201,16 @@ const Turnos = () => {
   const navigate = useNavigate()
 
   const imprimirTurno = () => {
-  const props = { user: user, values: values, tramite:tramiteSelected };
-  navigate("/imprimirTurno",{state:props})
+  // const props = { user: user, values: values, tramite:tramiteSelected };
+  // navigate("/imprimirTurno",{state:props})
+  navigate(`/imprimirTurno?nombre=${user.nombre_persona}&apellido=${user.apellido_persona}&cuil=${user.documento_persona}&tramite=${tramiteSelected.nombre_tramite}&dia=${values.fecha ? values.fecha : values.fechaAnularTurno}&hora=${values.hora}`);
   }
 
   return (
     <div className='container mt-5'>
       <div className='row'>
         <div className='col-12'>
-          <form onSubmit={getDataExisteTurno}>
+          <form >
 
             <div className='row mb-2 d-flex justify-content-center'>
 
@@ -343,6 +353,8 @@ const Turnos = () => {
             </div>
             {operacionExitosa != 1 &&
 
+            <>
+            
               <div className='row mb-2'>
                 <div className='col-md-4'>
                   <InputLabel className='text-black'>Trámites disponibles</InputLabel>
@@ -366,8 +378,8 @@ const Turnos = () => {
                   </Select>
 
 
-                  <Button disabled={bandera || tramites.length == 0 || botonState} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
-                  <ObservacionesTramitesTextArea valor={tramiteSelected?.observaciones}/>
+                  <Button disabled={bandera || tramites.length == 0 || botonState} className='my-3' onClick={getDataExisteTurno} variant="outlined">Consultar Turnos</Button>
+                  
                   
                 </div>
 
@@ -454,10 +466,24 @@ const Turnos = () => {
                 </div>
 
               </div>
+              {
+                tramiteSelected != "" &&
+                <div className='row mb-2'>
+                  <div className='col-md-6'>
+                    <ObservacionesTramitesTextArea valor={tramiteSelected?.observaciones} />
+                  </div>
+
+                  <div className='col-md-6'>
+                    <CampoAdicionalTurno valor={values.adicional} handleChange={handleChange} setNotificacion={setNotificacion} tramiteSelected={tramiteSelected} notificacion={notificacion}/>
+                  </div>
+                </div>
+              }
+            </>
+
             }
 
           </form>
-          <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} confirmarTurno={confirmarTurno} />
+          <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} setValues={setValues} confirmarTurno={confirmarTurno} tramiteSelected={tramiteSelected} setNotificacion={setNotificacion}/>
           <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno}/>
         </div>
 

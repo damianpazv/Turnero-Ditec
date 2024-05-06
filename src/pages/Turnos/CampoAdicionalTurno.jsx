@@ -1,9 +1,31 @@
 import * as React from 'react';
 import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAutosize';
 import { styled } from '@mui/system';
+import { useEffect } from 'react';
+import { useRef } from 'react';
 
-export default function ObservacionesTramitesTextArea({valor}) {
-  return <TextareaAutosize readOnly value={valor} aria-label="empty textarea" placeholder="Observación trámite" />
+export default function CampoAdicionalTurno({valor,handleChange,setNotificacion,tramiteSelected,notificacion}) {
+
+    const textareaRef = useRef(null);
+
+    useEffect(() => {
+        if (textareaRef.current && tramiteSelected.adicionalrequerido == 1) {
+          textareaRef.current.focus();
+        }
+      }, [tramiteSelected,notificacion]);
+
+    const handleChangeWithMaxLength = (event) => {
+        const { value } = event.target;
+        if (value.length <= 300) {
+          handleChange(event);
+        } else {
+
+            setNotificacion({ mensaje: "No puede ingresar mas de 300 caracteres", tipo: "error" });
+        }
+      };
+
+
+  return <TextareaAutosize ref={textareaRef} name='adicional' onChange={handleChangeWithMaxLength} value={valor} aria-label="empty textarea" placeholder={`Ingrese lo pertinente a su trámite ${tramiteSelected.adicionalrequerido == 1? "*": ""}`}/>
 }
 
 const blue = {
