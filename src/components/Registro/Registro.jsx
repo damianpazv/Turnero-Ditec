@@ -420,9 +420,9 @@ return (
 </header>
 
   
-<h1 className=' text-center mt-2 titulo'>Registro del ciudadano</h1>
+<h1 className=' text-center mt-3 titulo'>Registro del ciudadano</h1>
         
-        <Container fluid >
+        <Container fluid className='mt-4 mb-5' >
 
       <Row className='justify-content-center ' >
      <Col xs={12} md={8}  className='mt-2 pt-3 main mb-3 pb-3'>
@@ -763,17 +763,17 @@ return (
       </Row>
 
 
-    </Container>
+    </Container >
    
 
 <footer
- className='footerregistro d-flex flex-row  justify-content-center justify-content-sm-between'
+ className='footerregistro d-flex flex-row  justify-content-center justify-content-sm-between  '
  >
   <div  className='col-xs-12 text-center' >
 
   <img src={logo3} alt="Logo 1"className='logo3 mt-3 ms-2 mx-auto mb-2' />
   </div>
-  <div className='mt-4 me-3 d-none d-sm-block'>
+  <div className='mt-4 me-3 d-none d-md-block'>
     <p className='text-light'>Desarrollado por: Dirección de Innovación Tecnológica</p>
   </div>
 
