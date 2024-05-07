@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 import './registro.css';
 import Swal from 'sweetalert2';
 import {  Col, Container, Form, Row } from 'react-bootstrap';
@@ -17,18 +17,37 @@ import es from 'date-fns/locale/es';
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Button} from '@mui/material';
-
-
+import { useNavigate } from "react-router-dom";
+import useStore from '../../Zustand/Zustand';
+import { Terminos } from './Terminos';
 
 export const Registro = () => {
-   
+
   const [confirmarContraseña, setConfirmarContraseña] = useState(''); 
   const [modalAbierto, setModalAbierto] = useState(false);
+
+  const { authenticated} = useStore();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (authenticated) {
+      navigate("/turnos");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]);
+
+  const [modalAbierto2, setModalAbierto2] = useState(false);
+
   const abrirModal = () => {
       
       setModalAbierto(true);
   };
+  const abrirModal2 = () => {
+      
+    setModalAbierto2(true);
+};
   const cerrarModal=() => setModalAbierto(false)  
+  const cerrarModal2=() => setModalAbierto2(false)  
   const[formData, setFormData]= useState({
       
       documento_persona:"",
@@ -37,10 +56,10 @@ export const Registro = () => {
       email_persona:"",
       clave:"",
       telefono_persona:"",
-      domicilio_persona:"",
-      id_provincia:"",
-      localidad_persona:"",
-      id_pais:"",
+      domicilio_persona:null,
+      id_provincia:null,
+      localidad_persona:null,
+      id_pais:null,
       fecha_nacimiento_persona:"",
       id_genero:"",
       validado:false,
@@ -238,22 +257,22 @@ if( formData.clave !== confirmarContraseña){
     }
 
 
-  if( formData.id_provincia == 0){
-    return Swal.fire({
-        icon: 'error',
-        title: '¡Ups!',
-        text: 'Debe seleccionar una provincia',
-        confirmButtonColor:"#6495ED"                 
-      })
-}
-if( formData.id_pais == 0){
-  return Swal.fire({
-      icon: 'error',
-      title: '¡Ups!',
-      text: 'Debe seleccionar un país',   
-      confirmButtonColor:"#6495ED"              
-    })
-}
+//   if( formData.id_provincia == 0){
+//     return Swal.fire({
+//         icon: 'error',
+//         title: '¡Ups!',
+//         text: 'Debe seleccionar una provincia',
+//         confirmButtonColor:"#6495ED"                 
+//       })
+// }
+// if( formData.id_pais == 0){
+//   return Swal.fire({
+//       icon: 'error',
+//       title: '¡Ups!',
+//       text: 'Debe seleccionar un país',   
+//       confirmButtonColor:"#6495ED"              
+//     })
+// }
 
 if( formData.id_genero == 0){
   return Swal.fire({
@@ -333,6 +352,12 @@ console.log(error);
 // });
 
         
+    }
+
+  const  handlePaste = (e) => {
+      // Cancelar el evento para evitar que se pegue el texto
+      e.preventDefault();
+      // Puedes mostrar un mensaje o tomar otra acción aquí si lo deseas
     }
 
  const handleChange = (e, lon) => {
@@ -427,6 +452,7 @@ return (
       required
       className="custom-input-number input" 
       autoFocus
+      onPaste={handlePaste}
     />
 
   
@@ -496,6 +522,7 @@ return (
       required
       value={formData.email_persona}
       className='input'
+      onPaste={handlePaste}
     />
   </Form.Group>
 
@@ -523,6 +550,7 @@ return (
       maxLength={30}
       required
       className='input'
+      onPaste={handlePaste}
     />
   <div className="d-flex justify-content-end">
   {showPassword ? (
@@ -551,6 +579,7 @@ return (
       maxLength={30}
       required
       className='input'
+      onPaste={handlePaste}
     />
      <div className="d-flex justify-content-end">
   {showPassword2 ? (
@@ -583,7 +612,7 @@ return (
     />
   </Form.Group> */}
 
-  <Form.Group as={Row} className="mb-3" controlId="nacimiento">
+  <Form.Group  as={Row} className="mb-3" controlId="nacimiento">
     <Form.Label> <strong> Fecha de nacimiento</strong></Form.Label>
     <DatePicker
          selected={formData.fecha_nacimiento_persona}    
@@ -593,7 +622,10 @@ return (
       });} 
       
       }
-          
+      onPaste={handlePaste}
+      onKeyDown={(e) => {
+        e.preventDefault(); // Evita que se escriba en el input
+      }}  
          
           dateFormat="yyyy-MM-dd"
           showYearDropdown
@@ -605,8 +637,7 @@ return (
           locale={es}
           timeZone="America/Buenos_Aires"
           maxDate={maxDate}
-      
-          
+        
           
           
         />
@@ -623,6 +654,7 @@ return (
       value={formData.telefono_persona}
       required
       className="custom-input-number input" 
+      onPaste={handlePaste}
     />
   </Form.Group>
 
@@ -705,19 +737,19 @@ return (
   </div>
 
 </Col>
-<div className=" mt-4 ">
-        <Form.Check
-          type="checkbox"
-          id="default-checkbox"
-          label="Acepto los términos y condiciones"
-          required
-          
-          bsPrefix="custom-checkbox" 
-         
-          
-        />
-        
-      </div>
+<div className="mt-4">
+  <Form.Check
+    type="checkbox"
+    id="default-checkbox"
+    label={
+      <Form.Check.Label>
+        Acepto los <a className='text-blue' style={{ cursor: 'pointer' }} onClick={abrirModal2}>términos y condiciones</a>
+      </Form.Check.Label>
+    }
+    required
+    bsPrefix="custom-checkbox"
+  />
+</div>
 
    
 </Row>
@@ -753,7 +785,15 @@ return (
   cerrarModal={cerrarModal}
   setModalAbierto={setModalAbierto}
   />
-)}       
+)}    
+
+{modalAbierto2 && (
+  <Terminos
+  
+  cerrarModal={cerrarModal2}
+ 
+  />
+)} 
            
     
     </>

@@ -25,7 +25,7 @@ export default function CampoAdicionalTurno({valor,handleChange,setNotificacion,
       };
 
 
-  return <TextareaAutosize ref={textareaRef} name='adicional' onChange={handleChangeWithMaxLength} value={valor} aria-label="empty textarea" placeholder={`Ingrese lo pertinente a su trámite ${tramiteSelected.adicionalrequerido == 1? "*": ""}`}/>
+  return <TextareaAutosize disabled={tramiteSelected.adicionalrequerido == 0} ref={textareaRef} name='adicional' onChange={handleChangeWithMaxLength} value={valor} aria-label="empty textarea" placeholder={`Ingrese lo pertinente a su trámite ${tramiteSelected.adicionalrequerido == 1? "*": ""}`}/>
 }
 
 const blue = {

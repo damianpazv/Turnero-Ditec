@@ -15,7 +15,7 @@ function App() {
   const url = new URL(window.location.href);
   const logout = url.searchParams.get("logout");
 
-  localStorage.setItem("reparticion",1800);
+  localStorage.setItem("reparticion",1711);
 
   url.searchParams.delete("logout");
   history.replaceState(null, '', url.toString());
@@ -29,11 +29,12 @@ function App() {
         <Layout>
           <Routes>
             <Route exact path="/*" element={<Login />} />
-            <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} />
+            {/* <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} /> */}
             <Route exact path="/turnos" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
             <Route exact path="/imprimirTurno" element={<PrivateRoute key="imprimirTurnos"><ImprimirTurno /></PrivateRoute>} />
-            <Route exact path="/registro" element={<Registro />} />
-            <Route exact
+            <Route exact path="/registro" element={<Registro />} /> 
+
+            {/* <Route exact
               path="/estadistica_rrhh"
               element={
                 <PrivateRoute key="cap-humano">
@@ -48,13 +49,13 @@ function App() {
                   <Reclamos />
                 </PrivateRoute>
               }
-            />
+            /> */}
 
-            <Route exact path="/perfil" element={
+            {/* <Route exact path="/perfil" element={
             <PrivateRoute key="perfil"><Perfil /></PrivateRoute>
-            } />
+            } /> */}
 
-            <Route exact path="/panel_admin" element={<PanelAdmin />} />
+            {/* <Route exact path="/panel_admin" element={<PanelAdmin />} /> */}
 
           </Routes>
         </Layout>

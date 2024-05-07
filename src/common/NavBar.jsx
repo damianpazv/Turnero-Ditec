@@ -48,7 +48,7 @@ export default function NavBar() {
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
             <Toolbar>
-              <SideBar />
+              {/* <SideBar /> */}
               <div className="d-flex justify-content-between align-items-center w-100">
                 <img src={logoMuni} className="logoMuni2" />
                 {authenticated && (
@@ -80,7 +80,7 @@ export default function NavBar() {
                       open={Boolean(anchorEl)}
                       onClose={handleClose}
                     >
-                        <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem>
+                        {/* <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem> */}
                       <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
                     </Menu>
                   </div>

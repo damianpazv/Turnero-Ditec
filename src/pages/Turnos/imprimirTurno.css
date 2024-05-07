@@ -32,3 +32,10 @@
     font-size: 20px;
     text-align: center;
 }
+.notaAlPieComprobante{
+font-size: x-small;
+}
+
+.texto-justificado {
+    text-align: justify;
+}
