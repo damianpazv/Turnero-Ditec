@@ -183,7 +183,7 @@ const Turnos = () => {
       const { data } = await axios.get(`/turnos/anularTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`)
     
       setNotificacion({ mensaje: "Turno Cancelado", tipo: "success" });
-      setValues({ ...values, fecha: "" ,adicional:""});
+      setValues({ ...values, fecha: "" ,adicional:"",hora:""});
       setOperacionExitosa(undefined)
     } catch (error) {
       console.log(error);
@@ -193,7 +193,7 @@ const Turnos = () => {
 
   const nuevoTurno = () =>{
     setBotonState(true)
-    setValues({ ...values, fecha: "" });
+    setValues({ ...values, fecha: "",hora:"" });
     setOperacionExitosa(undefined)
     setBotonState(false)
   }
@@ -472,10 +472,12 @@ const Turnos = () => {
                   <div className='col-md-6'>
                     <ObservacionesTramitesTextArea valor={tramiteSelected?.observaciones} />
                   </div>
-
+                {
+                  tramiteSelected.adicionalrequerido == 1 &&
                   <div className='col-md-6'>
                     <CampoAdicionalTurno valor={values.adicional} handleChange={handleChange} setNotificacion={setNotificacion} tramiteSelected={tramiteSelected} notificacion={notificacion}/>
                   </div>
+                }
                 </div>
               }
             </>
