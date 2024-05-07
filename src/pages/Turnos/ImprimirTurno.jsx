@@ -65,29 +65,8 @@ const ImprimirTurno = () => {
         <>
             {
                 turnoValido ?
-                <div>
-                    <div className='cont container-fluid w-100 d-md-none mt-5'>
-                        <div className='imprimir'>
-                            <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
-                            <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
-
-                            <div className='datosCont mt-4'>
-                                <p>Tipo de Trámite: {tramite}</p>
-                                <div className='datos '>
-                                    <p>Día: {values?.dia_turno.length > 12 ? formatFechaTurno(values?.dia_turno) : values?.dia_turno}</p>
-                                    <p>Hora: {values?.hora_turno}</p>
-                                </div>
-
-                                <p className='mt-4'>CUIL: {values.dni}</p>
-                                <div className='datos'>
-                                    <p>Apellido: {values?.apellido}</p>
-                                    <p>Nombre: {values?.nombre}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {/* ESTA DOS VECES PARA MANEJAR EL RESPONSIVE */}
-                    <div className='cont container-fluid w-50 d-none d-md-block mt-5'>
+                    <div>
+                        <div className='cont container-fluid w-100 d-md-none mt-5'>
                             <div className='imprimir'>
                                 <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
                                 <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
@@ -105,17 +84,47 @@ const ImprimirTurno = () => {
                                         <p>Nombre: {values?.nombre}</p>
                                     </div>
                                 </div>
-                            </div>
-                    </div>
 
-                </div>
-                : turnoValido == undefined ?
-              
+                            </div>
+                            <div className='texto-justificado'>
+                                <small className='notaAlPieComprobante'>Nota: El presente comprobante cumple solo una función de recordatorio para el causante, el mismo es intransferible y carece de validez para reclamos futuros. El causante solo podrá acceder al turno si se encuentra registrado en nuestra base de datos.</small>
+                            </div>
+                        </div>
+                        {/* ESTA DOS VECES PARA MANEJAR EL RESPONSIVE */}
+                        <div className='cont container-fluid w-50 d-none d-md-block mt-5'>
+                            <div className='imprimir'>
+                                <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
+                                <h5 className='mt-3 text-black'>TURNO CONFIRMADO</h5>
+
+                                <div className='datosCont mt-4'>
+                                    <p>Tipo de Trámite: {tramite}</p>
+                                    <div className='datos '>
+                                        <p>Día: {values?.dia_turno.length > 12 ? formatFechaTurno(values?.dia_turno) : values?.dia_turno}</p>
+                                        <p>Hora: {values?.hora_turno}</p>
+                                    </div>
+
+                                    <p className='mt-4'>CUIL: {values.dni}</p>
+                                    <div className='datos'>
+                                        <p>Apellido: {values?.apellido}</p>
+                                        <p>Nombre: {values?.nombre}</p>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div className='texto-justificado'>
+                                <small className='notaAlPieComprobante'>Nota: El presente comprobante cumple solo una función de recordatorio para el causante, el mismo es intransferible y carece de validez para reclamos futuros. El causante solo podrá acceder al turno si se encuentra registrado en nuestra base de datos.</small>
+                            </div>
+                        </div>
+
+                    </div>
+                    : turnoValido == undefined ?
+
                         <Box className="d-flex justify-content-center mt-5">
                             <CircularProgress />
                         </Box>
-                      
-               : !turnoValido &&   <Navigate to="/turnos" />
+
+                        : !turnoValido && <Navigate to="/turnos" />
             }
         </>
      
