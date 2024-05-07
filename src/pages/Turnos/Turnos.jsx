@@ -1,44 +1,55 @@
-import { Alert, Box, Button, CircularProgress, InputLabel, MenuItem, Select, Snackbar, TextField } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, InputLabel, MenuItem, Select, Skeleton, Snackbar, TextField, TextareaAutosize } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import axios from '../../config/axios';
 import useStore from '../../Zustand/Zustand';
 import "./Turnos.css"
 import DatePickerComponent from './Fechas';
+import ConfirmarTurnoModal from './ConfirmarTurnoModal';
+import AnularTurnoModal from './AnularTurnoModal';
+import ObservacionesTramitesTextArea from './ObservacionesTramite';
+import { useNavigate } from 'react-router-dom';
+import CampoAdicionalTurno from './CampoAdicionalTurno';
 
 const Turnos = () => {
 
   const { user, authenticated, loading } = useStore();
- 
-  const [tramites , setTramites] = useState([])
-  const [existeTurno , setExisteTurno] = useState(null)
+
+  const [tramites, setTramites] = useState([])
   const [turnosPorDia, setTurnosPorDia] = useState([]);
   const [turnosPorHora, setTurnosPorHora] = useState([]);
+  const [botonState, setBotonState] = useState(false)
 
-  const [flag , setFlag] = useState(false)
-  const [error, setError] = useState("");
-  
-  const [minDate , setMinDate] = useState("")
-  const [maxDate , setMaxDate] = useState("")
-  const [fechasHabilitadas,setFechasHabilitadas] = useState([]);
-  
-  const [values, setValues] = useState({dni:"",descripcion:"",tramite:"",fecha: ""});
+  const [notificacion, setNotificacion] = useState({ mensaje: "", tipo: "" });
 
+  const [fechasHabilitadas, setFechasHabilitadas] = useState([]);
+
+  const [values, setValues] = useState({ cuil: "", descripcion: "", tramite: "", fecha: "", hora: "", adicional:"" });
+
+  const [tramiteSelected, setTramiteSelected] = useState("")
   const handleChangeSelect = (e) => {
-    console.log(e.target);
-    setValues({ ...values, [e.target.name]: e.target.value, fecha:"" });
-    console.log(e.target.value);
+
+    setTramiteSelected(tramites.find(t=>t.idtramite == e.target.value))
+    setValues({ ...values, [e.target.name]: e.target.value, fecha: "" });
   };
 
-  const handleChangeSelectHora = (e)=>{
-   
-    setValues({ ...values, [e.target.name]: e.target.value, fecha:"" });
-    console.log(e.target.value);
+  const [open, setOpen] = useState(false);
+  const [openAnularTurno, setOpenAnularTurno] = useState(false);
+
+  const handleChangeSelectHora = (e) => {
+
+    setValues({ ...values, [e.target.name]: e.target.value });
+  
+    setOpen(true)
   }
 
-  const obtenerTramites = async ()=>{
+  const handleChange = (e) =>{
+    setValues({ ...values, [e.target.name]: e.target.value });
+  }
+
+  const obtenerTramites = async () => {
     try {
-      const {data} = await axios.get("/turnos/listarTramites?reparticion_id=1800")
-      console.log(data);
+      const { data } = await axios.get(`/turnos/listarTramites?reparticion_id=${localStorage.getItem("reparticion")}`)
+  
       setTramites(data.tramites)
     } catch (error) {
       console.log(error);
@@ -48,146 +59,160 @@ const Turnos = () => {
   useEffect(() => {
     obtenerTramites();
   }, [])
-  
 
-  const getData = async (e) => {
-    // setFormFlagReclamos(false);
+  const [bandera, setBandera] = useState(false)
+
+  const getDataExisteTurno = async (e) => {
     e.preventDefault();
-    try {
-      setFlag(true);
-      // setFlagButton(true);
-      const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
-     console.log(resultado.data[0][0] == 0);
-     setExisteTurno(resultado.data[0][0] == 0 ? false : true)
+    if (values.tramite != "") {
+      setBandera(true);
+      try {
+        const resultado = await axios.get(`/turnos/existeTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`);
 
-      // setFormFlagReclamos(false)
-      // setFlagButton(false);
-    } catch (error) {
-      console.log("mal");
-      setErrorPermiso(error.response.data?.message || error.message)
+        if (resultado.data.length > 0 && resultado.data[0][0] != 0) {
+          console.log("ya tengo turno");
+          setValues({ ...values, [e.target.name]: e.target.value, hora: resultado.data[0].hora_turno, fechaAnularTurno: resultado.data[0].dia_turno });
+          setOpenAnularTurno(true);
+          setBandera(false);
+        } else {
+
+          obtenerTurnosPorDia()
+
+        }
+
+      } catch (error) {
+        console.log("mal");
+        setNotificacion({ mensaje: error.response.data?.message || error.message, tipo: "error" });
+      }
+    } else {
+      setNotificacion({ mensaje: "Debe seleccionar un trámite", tipo: "error" });
     }
-    // setFormFlagReclamos(true);
+
   };
 
-  const obtenerTurnosPorDia = async (e) => {
-    // setFormFlagReclamos(false);
-    // e.preventDefault();
+
+  const obtenerTurnosPorDia = async () => {
+
     try {
-      // setFlagButton(true);
       const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorDia?id_tramite=${values.tramite}`);
-      console.log(resultado);
+  
       setTurnosPorDia(resultado.data)
-      setExisteTurno(null)
-      if(resultado.data.length == 0){
-        setError("El trámite ingresado no tiene turnos disponibles")
-        setFlag(false)
+
+      if (resultado.data.length == 0) {
+        setNotificacion({ mensaje: "El trámite ingresado no tiene turnos disponibles", tipo: "error" });
+        setBandera(false);
+        return;
       }
       const fechasOrdenadas = resultado.data.map(fecha => new Date(fecha.dia_turno));
+
       const fechaMinima = new Date(Math.min(...fechasOrdenadas));
       const fechaMaxima = new Date(Math.max(...fechasOrdenadas));
 
-      // Formatea las fechas para establecer el valor de los atributos min y max del input
       const minDate = fechaMinima.toISOString().split('T')[0];
       const maxDate = fechaMaxima.toISOString().split('T')[0];
 
-      setValues({...values,fecha:minDate})
-      setMinDate(minDate);
-      setMaxDate(maxDate);
+      setValues({ ...values, fecha: minDate })
+      obtenerTurnosPorHora(minDate)
 
-      console.log(minDate);
-      console.log(maxDate);
-
-      
-      
       const fechasConFormatoCorrecto = resultado.data.map(item => item.dia_turno.split('T')[0]);
 
-      console.log(fechasConFormatoCorrecto);
       const fechasHabilitadas = ["2024-04-27", "2024-04-28"];
       setFechasHabilitadas(fechasConFormatoCorrecto);
-      // setFormFlagReclamos(false)
-      // setFlagButton(false);
+
     } catch (error) {
       console.log(error);
       console.log("mal");
-      // setErrorPermiso(error.response.data?.message || error.message)
     }
-    // setFormFlagReclamos(true);
+
   };
 
-  useEffect(() => {
-   if(existeTurno == false){
-    obtenerTurnosPorDia();
-    // setExisteTurno(null)
-   }
-   console.log("holka");
-  }, [existeTurno])
+  const obtenerTurnosPorHora = async (fecha) => {
 
-  const eliminarDuplicados = (array) => {
-    return array.filter((elem, index, self) => {
-        return index === self.findIndex((t) => (
-            t.hora_turno === elem.hora_turno
-        ));
-    });
-};
-
-  const obtenerTurnosPorHora = async (e) => {
     try {
-      const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorHora?id_tramite=${values.tramite}&fecha_solicitada=${values.fecha}`);
-      console.log(resultado);
-      setTurnosPorHora(eliminarDuplicados(resultado.data));
-      if(resultado.data.length == 0){
-        setError("No hay turnos disponibles para la fecha ingresada")
+      const resultado = await axios.get(`/turnos/buscarTurnosDisponiblesPorHora?id_tramite=${values.tramite}&fecha_solicitada=${fecha}`);
+
+      setTurnosPorHora(resultado.data);
+      if (resultado.data.length == 0) {
+        setNotificacion({ mensaje: "No hay turnos disponibles para la fecha ingresada", tipo: "error" });
+        setBandera(false);
       }
-      setFlag(false);
+
     } catch (error) {
       console.log(error);
     }
+    setBandera(false);
   }
 
-  const handleInputChange = (e) => {
-
-    // const { name, value } = e.target;
-    //   setValues({
-    //     ...values,
-    //     [name]: value,
-    //   });
-
-    const { name, value } = e.target;
-    console.log(value);
-    console.log(turnosPorDia);
-    if (fechasHabilitadas.includes(value)) {
-      setValues({ ...values, [name]: value });
-     
-    }else{
-      setError("No hay turnos disponibles para la fecha ingresada")
-    }
-  };
-
-  useEffect(() => {
-    if(values.fecha != ""){
-      setFlag(true)
+  const handleInputChange = (value) => {
+    if (value != "") {
+      setBandera(true)
       setTurnosPorHora([])
-     obtenerTurnosPorHora();
-    //  setExisteTurno(null)
-    }else{
-      //logica al seleccionar la hora
+      obtenerTurnosPorHora(value);
     }
-    console.log("chau");
-   }, [values])
 
-
-   const handleCloseSnackbar = () => {
-    setError("");
   };
 
+  const handleCloseSnackbar = () => {
+    setNotificacion({ mensaje: "", tipo: "" });
+  };
+
+  const [operacionExitosa, setOperacionExitosa] = useState(undefined);
+
+  const confirmarTurno = async () => {
+    try {
+      setBotonState(true);
+      const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora, email: user.email_persona, nombre_tramite: tramiteSelected.nombre_tramite, adicional: values.adicional });
+    
+      if (Object.values(data)[0] == 0) {
+        setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora", tipo: "error" });
+      } else {
+
+        setOperacionExitosa(Object.values(data)[0]);
+        setNotificacion({ mensaje: "Turno Confirmado.\nLe enviamos un email con la información del turno.", tipo: "success" });
+        setValues({ ...values, adicional:"" });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+      setBotonState(false);
+  }
+
+  const anularTurno = async () => {
+    setBotonState(true)
+    try {
+      const { data } = await axios.get(`/turnos/anularTurno?cuil=${user.documento_persona}&id_tramite=${values.tramite}`)
+    
+      setNotificacion({ mensaje: "Turno Cancelado", tipo: "success" });
+      setValues({ ...values, fecha: "" ,adicional:""});
+      setOperacionExitosa(undefined)
+    } catch (error) {
+      console.log(error);
+    }
+    setBotonState(false)
+  }
+
+  const nuevoTurno = () =>{
+    setBotonState(true)
+    setValues({ ...values, fecha: "" });
+    setOperacionExitosa(undefined)
+    setBotonState(false)
+  }
+
+  const navigate = useNavigate()
+
+  const imprimirTurno = () => {
+  // const props = { user: user, values: values, tramite:tramiteSelected };
+  // navigate("/imprimirTurno",{state:props})
+  navigate(`/imprimirTurno?nombre=${user.nombre_persona}&apellido=${user.apellido_persona}&cuil=${user.documento_persona}&tramite=${tramiteSelected.nombre_tramite}&dia=${values.fecha ? values.fecha : values.fechaAnularTurno}&hora=${values.hora}`);
+  }
 
   return (
     <div className='container mt-5'>
       <div className='row'>
         <div className='col-12'>
-          <form onSubmit={getData}>
+          <form >
 
-            <div className='row mb-2'>
+            <div className='row mb-2 d-flex justify-content-center'>
 
               <h3 className='text-center mb-4'>Solicitud de Turnos</h3>
               <div className='col-md-6'>
@@ -201,7 +226,7 @@ const Turnos = () => {
                     type="text"
                     name="nombre"
                     InputLabelProps={{ shrink: true }}
-                    inputProps={{ maxLength: 20 }}
+
                   />
                   <TextField
                     readOnly
@@ -214,9 +239,7 @@ const Turnos = () => {
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    inputProps={{
-                      maxLength: 20, // Establece la longitud máxima según tus necesidades
-                    }}
+
                   />
                   <TextField
                     readOnly
@@ -230,9 +253,7 @@ const Turnos = () => {
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    inputProps={{
-                      maxLength: 20, // Establece la longitud máxima según tus necesidades
-                    }}
+
                   />
 
                 </div>
@@ -252,9 +273,7 @@ const Turnos = () => {
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    inputProps={{
-                      maxLength: 20, // Establece la longitud máxima según tus necesidades
-                    }}
+
                   />
                   <TextField
                     readOnly
@@ -265,79 +284,114 @@ const Turnos = () => {
                       // Filtra solo los caracteres numéricos
                       const numericValue = e.target.value.replace(/\D/g, "");
 
-                      // Actualiza el estado solo si la entrada es numérica
-                      // handleChange({
-                      //   target: {
-                      //     name: "dni",
-                      //     value: numericValue,
-                      //   },
-                      // });
                     }}
                     label="CUIL"
                     type="text"
-                    name="dni"
+                    name="cuil"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    inputProps={{
-                      maxLength: 4,
-                      minLength: 4 // Establece la longitud máxima según tus necesidades
-                    }}
+
                   />
                   <TextField
                     readOnly
                     // eslint-disable-next-line react/prop-types
                     value={user.email_persona}
-                    // onChange={handleChange}
                     label="Email"
                     type="text"
                     name="descripcion"
                     InputLabelProps={{
                       shrink: true,
                     }}
-                    inputProps={{
-                      maxLength: 20, // Establece la longitud máxima según tus necesidades
-                    }}
+
                   />
                 </div>
 
               </div>
+              {
+                operacionExitosa == 1 &&
+                <div className='col-md-5 turnoAsignado'>
+                  <TextField
+                    readOnly
+                    className='mb-3'
+                    // eslint-disable-next-line react/prop-types
+                    value={values.fecha}
+                    onChange={(e) => {
+                      // Filtra solo los caracteres numéricos
+                      const numericValue = e.target.value.replace(/\D/g, "");
+
+                    }}
+                    label="Fecha"
+                    type="text"
+                    name="fecha"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+
+                  />
+                  <TextField
+                  className=''
+                    readOnly
+                    // eslint-disable-next-line react/prop-types
+                    value={values.hora}
+                    label="Hora"
+                    type="text"
+                    name="hora"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+
+                  />
+                  <div className='btnTurno'> 
+
+                    <Button onClick={imprimirTurno} disabled={botonState} className='my-3' variant="outlined">Imprimir Turno</Button>
+                    <Button onClick={anularTurno} disabled={botonState} className='my-3 ' variant="outlined">Cancelar Turno</Button>
+                    <Button onClick={nuevoTurno} disabled={botonState} className='my-3 ' variant="outlined">Nuevo Turno</Button>
+                  </div>
+                </div>
+              }
             </div>
-            <div className='row mb-2'>
-              <div className='col-md-4'>
-                <InputLabel className='text-black'>Trámites disponibles</InputLabel>
-                <Select
-                  // eslint-disable-next-line react/prop-types
-                  value={values.tramite}
-                  onChange={handleChangeSelect}
-                  name="tramite"
-                  required
-                  disabled={tramites.length === 0 && flag}
-                  className="mt-2"
-                  // label="Trámite"
-                  style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
-                >
-                  {tramites.length > 0 &&
-                    tramites.map((st, index) => (
-                      <MenuItem key={index} value={st.idtramite}>
-                        {st.nombre_tramite}
-                      </MenuItem>
-                    ))}
-                </Select>
-                
-                
-                <Button disabled={flag} className='my-3' type='submit' variant="outlined">Consultar Turnos</Button>
-              </div>
+            {operacionExitosa != 1 &&
+
+            <>
+            
+              <div className='row mb-2'>
+                <div className='col-md-4'>
+                  <InputLabel className='text-black'>Trámites disponibles</InputLabel>
+                  <Select
+                    // eslint-disable-next-line react/prop-types
+                    value={values.tramite}
+                    onChange={handleChangeSelect}
+                    name="tramite"
+                    required
+                    disabled={bandera || tramites.length == 0}
+                    className="mt-2"
+                    // label="Trámite"
+                    style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
+                  >
+                    {tramites.length > 0 &&
+                      tramites.map((st, index) => (
+                        <MenuItem key={index} value={st.idtramite}>
+                          {st.nombre_tramite}
+                        </MenuItem>
+                      ))}
+                  </Select>
+
+
+                  <Button disabled={bandera || tramites.length == 0 || botonState} className='my-3' onClick={getDataExisteTurno} variant="outlined">Consultar Turnos</Button>
+                  
+                  
+                </div>
 
                 <div className='col-md-4'>
-                {
-                  turnosPorDia.length && !flag > 0 && values.fecha != ""?
-                    <>
-                      <InputLabel className='text-black'>Fechas disponibles</InputLabel>
-                      
-                        <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values = {values} setValues = {setValues}/>
-                      
-                      {/* <TextField
+                  {
+                    !bandera && values.fecha != "" ?
+                      <>
+                        <InputLabel className='text-black ms-md-5 ps-md-2'>Fechas disponibles</InputLabel>
+
+                        <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values={values} setValues={setValues} />
+
+                        {/* <TextField
                         label="Fecha"
                         type="date"
                         className='mt-2'
@@ -354,73 +408,102 @@ const Turnos = () => {
                         }}
                         style={{ width: '100%' }}
                       /> */}
-                  
-                    </>
-                    : flag &&
-                    <Box className="d-flex justify-content-center mt-5">
-                      <CircularProgress />
-                    </Box>
-                   
-                }
+
+                      </>
+                      : bandera &&
+                      // <Box className="d-flex justify-content-center mt-5">
+                      //   <CircularProgress />
+                      // </Box>
+                      <div className='d-md-flex justify-content-center'>
+
+                        <Box className="mt-3" sx={{ width: 300 }}>
+                          <Skeleton />
+                          <Skeleton animation="wave" />
+                          <Skeleton animation={false} />
+                        </Box>
+                      </div>
+
+                  }
                 </div>
 
-                
-                <div className='col-md-4'>
-                {
-                  turnosPorDia.length && !flag > 0 && values.fecha != ""?
-                    <>
-                      <InputLabel className='text-black'>Horas disponibles</InputLabel>
-                      {/* {
-                       turnosPorHora.length>0 && turnosPorHora.map((t, index) => (
-                          <li key={index} >
-                            {t.hora_turno}
-                          </li>
-                        ))
-                      } */}
 
-                      <Select
-                        // eslint-disable-next-line react/prop-types
-                        value={values.hora}
-                        onChange={handleChangeSelectHora}
-                        name="hora"
-                        required
-                        disabled={tramites.length === 0 && flag}
-                        className="mt-2"
-                        // label="Trámite"
-                        style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
-                      >
-                        {turnosPorHora.length>0 && turnosPorHora.map((st, index) => (
+                <div className='col-md-4'>
+                  {
+                    !bandera && values.fecha != "" ?
+                      <>
+                        <InputLabel className='text-black'>Horas disponibles</InputLabel>
+
+                        <Select
+                          // eslint-disable-next-line react/prop-types
+                          value={values.hora}
+                          onChange={handleChangeSelectHora}
+                          name="hora"
+                          // required
+                          disabled={tramites.length === 0 && bandera}
+                          className="mt-2"
+                          // label="Trámite"
+                          style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
+                        >
+                          {turnosPorHora.length > 0 && turnosPorHora.map((st, index) => (
                             <MenuItem key={index} value={st.hora_turno}>
                               {st.hora_turno}
                             </MenuItem>
                           ))}
-                      </Select>
+                        </Select>
 
-                    </>
-                    : flag &&
-                    <Box className="d-flex justify-content-center mt-5">
-                      <CircularProgress />
-                    </Box>
-                   
-                }
-           
+                      </>
+                      : bandera &&
+                      // <Box className="d-flex justify-content-center mt-5">
+                      //   <CircularProgress />
+                      // </Box>
+                      <Box className="mt-3" sx={{ width: {xs:300, md:400} }}>
+                        <Skeleton />
+                        <Skeleton animation="wave" />
+                        <Skeleton animation={false} />
+                      </Box>
+                  }
+
                 </div>
-             
-            </div>
-          
+
+              </div>
+              {
+                tramiteSelected != "" &&
+                <div className='row mb-2'>
+                  <div className='col-md-6'>
+                    <ObservacionesTramitesTextArea valor={tramiteSelected?.observaciones} />
+                  </div>
+
+                  <div className='col-md-6'>
+                    <CampoAdicionalTurno valor={values.adicional} handleChange={handleChange} setNotificacion={setNotificacion} tramiteSelected={tramiteSelected} notificacion={notificacion}/>
+                  </div>
+                </div>
+              }
+            </>
+
+            }
+
           </form>
-      
+          <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} setValues={setValues} confirmarTurno={confirmarTurno} tramiteSelected={tramiteSelected} setNotificacion={setNotificacion}/>
+          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno}/>
         </div>
+
         {
-          error != "" &&
+          notificacion.mensaje != "" &&
           <Snackbar
-          open={error != "" ? true : false}
-          autoHideDuration={5000000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "center", horizontal: "center" }} // Ajusta la posición del Snackbar
-        >
-          <Alert severity="warning">{error}</Alert>
-        </Snackbar>
+            open={notificacion.mensaje != "" ? true : false}
+            autoHideDuration={6000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: "center", horizontal: "center" }}
+          >
+            <Alert className='mjeTurnos' severity={notificacion.tipo}>
+                {notificacion.mensaje.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </Alert>
+          </Snackbar>
         }
       </div>
     </div>

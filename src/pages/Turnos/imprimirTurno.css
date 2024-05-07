@@ -1,0 +1,34 @@
+.cont{
+    border: solid 2px;
+    border-radius: 10px;
+    margin: 20px;
+}
+.imprimir {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.datosCont {
+    columns: 1;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+ 
+.datosCont .datos {
+    width: 60%;
+}
+
+.datosCont p {
+    width: 100%;
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+}

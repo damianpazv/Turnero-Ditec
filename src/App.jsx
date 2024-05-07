@@ -9,10 +9,13 @@ import Perfil from "./pages/Perfil/Perfil";
 import { Registro } from "./components/Registro/Registro";
 import PanelAdmin from "./components/Admin/PanelAdmin";
 import Turnos from "./pages/Turnos/Turnos";
+import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
 
 function App() {
   const url = new URL(window.location.href);
   const logout = url.searchParams.get("logout");
+
+  localStorage.setItem("reparticion",1800);
 
   url.searchParams.delete("logout");
   history.replaceState(null, '', url.toString());
@@ -28,6 +31,7 @@ function App() {
             <Route exact path="/*" element={<Login />} />
             <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} />
             <Route exact path="/turnos" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
+            <Route exact path="/imprimirTurno" element={<PrivateRoute key="imprimirTurnos"><ImprimirTurno /></PrivateRoute>} />
             <Route exact path="/registro" element={<Registro />} />
             <Route exact
               path="/estadistica_rrhh"

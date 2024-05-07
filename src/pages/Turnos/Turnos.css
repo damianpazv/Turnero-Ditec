@@ -1,10 +1,24 @@
-.css-to2f46-MuiPaper-root-MuiAlert-root {
+.mjeTurnos {
     position: absolute;
-    top: -25vh !important;
+    top: -30vh !important;
 }
-.inputDatePicker{
+
+.inputDatePicker {
     width: 300px;
     height: 55px;
     border: 1px solid #C4C4C4;
     border-radius: 3.5%;
+}
+
+.turnoAsignado {
+    display: flex;
+    flex-direction: column;
+    padding-top: 25px;
+}
+
+.btnTurno {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    
 }

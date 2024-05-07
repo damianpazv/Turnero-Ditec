@@ -8,6 +8,7 @@ import useStore from "../../Zustand/Zustand";
 import { LOGIN_VALUES } from "../../helpers/constantes";
 import { useNavigate } from "react-router-dom";
 import { RestablecerClave } from "./RestablecerClave";
+import { ReenviarValidacion } from "./ReenviarValidacion";
 
 const Login = () => {
   const { authenticated, botonState, login, errors, setErrors } = useStore();
@@ -16,8 +17,11 @@ const Login = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
   const [modalAbierto, setModalAbierto] = useState(false);
+  const [modalAbierto2, setModalAbierto2] = useState(false);
   const abrirModal = () => setModalAbierto(true);
-  const cerrarModal=() => setModalAbierto(false);
+  const cerrarModal = () => setModalAbierto(false);
+  const abrirModal2 = () => setModalAbierto2(true);
+  const cerrarModal2 = () => setModalAbierto2(false);
 
   const handleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -34,7 +38,7 @@ const Login = () => {
       errores.dni = "El CUIL es obligatorio";
     } else if (campos.dni.length > 11) {
       errores.dni = "El CUIL no debe poseer más de 11 digitos";
-    } else if (campos.dni.length < 11){
+    } else if (campos.dni.length < 11) {
       errores.dni = "El CUIL debe tener 11 digitos";
     }
 
@@ -66,7 +70,7 @@ const Login = () => {
     if (authenticated) {
       navigate("/home");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated]);
 
   useEffect(() => {
@@ -125,12 +129,12 @@ const Login = () => {
             <span>Contraseña</span>
             <i></i>
           </div>
-        <div className="d-flex justify-content-center align-items-center mt-4">
-          
-          
+          <div className="d-flex justify-content-center align-items-center mt-4">
 
-          
-        </div>
+
+
+
+          </div>
           <Button
             variant="contained"
             className="btn-light mt-4 buttonLoginColor"
@@ -140,16 +144,20 @@ const Login = () => {
             Ingresar
           </Button>
           <Button
-onClick={()=>navigate("/registro")}
+            onClick={() => navigate("/registro")}
 
->
-Registrarse
+          >
+            Registrarse
 
           </Button>
 
-          <p className="datoPie mt-2 text-center ">¿Olvidó su clave? Haga click <a 
-          onClick={abrirModal}
-          ><strong>aquí</strong></a> </p> 
+          <p className="datoPie mt-2 text-center ">¿Olvidó su clave? Haga click <a
+            onClick={abrirModal}
+          ><strong>aquí</strong></a> </p>
+
+<p className="datoPie mb-3 text-center "> <a
+            onClick={abrirModal2}
+          >Reenviar email de validación</a> </p>
 
           <div className="d-flex flex-column justify-content-center align-items-center">
             <p className="footer p-1 m-0" style={{ fontSize: "0.7em" }}>
@@ -187,15 +195,23 @@ Registrarse
       )}
 
 
-{modalAbierto && (
-  <RestablecerClave 
-  
-  cerrarModal={cerrarModal}
-  setModalAbierto={setModalAbierto}
-  /> 
-)}
+      {modalAbierto && (
+        <RestablecerClave
+
+          cerrarModal={cerrarModal}
+          setModalAbierto={setModalAbierto}
+        />
+      )}
 
 
+{modalAbierto2 && (
+        <ReenviarValidacion
+
+          cerrarModal={cerrarModal2}
+         
+        
+        />
+      )}
 
 
     </div>

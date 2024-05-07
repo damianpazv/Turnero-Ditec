@@ -131,8 +131,7 @@ export default function ListaPrueba() {
       </ListItemButton>
       
       {/* Construye cada elemento del menú */}
-     
-      { false && menuItemsFiltered.map((item, index) => (
+      {false && menuItemsFiltered.map((item, index) => (
         <div key={index} className="d-flex justify-content-between w-100 flex-column">
           {/* Elemento del menú */}
           <ListItemButton onClick={() => handleClick(item.label)} >

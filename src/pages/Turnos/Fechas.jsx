@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import es from 'date-fns/locale/es'; // Importa las traducciones al español
+import { formatFecha } from '../../utils/mostrarFecha';
 
 const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setValues}) => {
   const [availableDates, setAvailableDates] = useState(fechasHabilitadas);
@@ -10,7 +11,6 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   // Simulación de obtención de fechas disponibles desde la base de datos
   useEffect(() => {
     const data = ["2024-04-29","2024-04-30","2024-07-11"];
-    console.log(fechasHabilitadas);
     const dates = fechasHabilitadas.map(dateString => {
       const [year, month, day] = dateString.split('-');
       // Crear un objeto Date y establecer la hora a medianoche localmente
@@ -31,11 +31,10 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   const [flag,setFlag] = useState(false)
 
   const handleDateChange = date => {
-
-    // Aquí puedes manejar el cambio de fecha como desees
-    console.log(formatDate(date));
     setDateSelected(date);
-    setValues({ ...values, "fecha": formatDate(date) });
+    // formatFecha(formatDate(date))
+    handleInputChange(formatDate(date) )
+    setValues({ ...values, "fecha": formatDate(date), hora:"" });
   };
 
   const handleInputClick = () => {
@@ -48,7 +47,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   
   return (
     
-    <div onClick={handleInputClick}>
+    <div className='d-md-flex justify-content-center' onClick={handleInputClick}>
       <DatePicker
         className='mt-2 inputDatePicker text-center'
         includeDates={availableDates}
@@ -56,7 +55,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
         selected={dateSelected}
         onChange={handleDateChange}
         name= "fecha"
-        value={values.fecha}
+        value={formatFecha(values.fecha)}
         dateFormat="dd-MM-yyyy"
          readOnly
          open={flag}
@@ -67,6 +66,3 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
 };
 
 export default DatePickerComponent;
-
-
-
