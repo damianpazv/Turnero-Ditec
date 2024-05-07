@@ -15,7 +15,10 @@ function App() {
   const url = new URL(window.location.href);
   const logout = url.searchParams.get("logout");
 
-  localStorage.setItem("reparticion",1711);
+  const queryString = window.location.search;
+  const params = new URLSearchParams(queryString);
+  const reparti = params.get('rep');
+  localStorage.setItem("reparticion", reparti? reparti : 1711);
 
   url.searchParams.delete("logout");
   history.replaceState(null, '', url.toString());

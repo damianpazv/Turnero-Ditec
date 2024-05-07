@@ -79,7 +79,7 @@ const useStore = create((set) => ({
     set({authenticated: false });
     localStorage.removeItem("token");
     localStorage.removeItem("saveChanges");
-    localStorage.removeItem("reparticion");
+    // localStorage.removeItem("reparticion");
   },
 
   getAuth: async () => {
