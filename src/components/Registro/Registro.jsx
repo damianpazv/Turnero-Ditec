@@ -18,7 +18,8 @@ import es from 'date-fns/locale/es';
 import Skeleton from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Button} from '@mui/material';
-
+import { useNavigate } from "react-router-dom";
+import useStore from '../../Zustand/Zustand';
 
 
 export const Registro = () => {
@@ -26,6 +27,17 @@ export const Registro = () => {
   const [confirmarContraseña, setConfirmarContraseña] = useState('');
   
   const [modalAbierto, setModalAbierto] = useState(false);
+
+  const { authenticated} = useStore();
+  const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (authenticated) {
+      navigate("/turnos");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]);
+
   const abrirModal = () => {
       console.log("Abriendo modal...");
       setModalAbierto(true);

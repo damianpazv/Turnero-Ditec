@@ -203,7 +203,7 @@ const Turnos = () => {
   const imprimirTurno = () => {
   // const props = { user: user, values: values, tramite:tramiteSelected };
   // navigate("/imprimirTurno",{state:props})
-  navigate(`/imprimirTurno?nombre=${user.nombre_persona}&apellido=${user.apellido_persona}&cuil=${user.documento_persona}&tramite=${tramiteSelected.nombre_tramite}&dia=${values.fecha ? values.fecha : values.fechaAnularTurno}&hora=${values.hora}`);
+  navigate(`/imprimirTurno?cuil=${user.documento_persona}&tramite=${tramiteSelected.nombre_tramite}&id_tramite=${values.tramite}`);
   }
 
   return (

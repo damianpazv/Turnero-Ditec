@@ -51,9 +51,9 @@ function App() {
               }
             /> */}
 
-            <Route exact path="/perfil" element={
+            {/* <Route exact path="/perfil" element={
             <PrivateRoute key="perfil"><Perfil /></PrivateRoute>
-            } />
+            } /> */}
 
             {/* <Route exact path="/panel_admin" element={<PanelAdmin />} /> */}
 
