@@ -1,6 +1,5 @@
-
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react'
+import React, { forwardRef, useState } from 'react'
 import './registro.css';
 import Swal from 'sweetalert2';
 import {  Col, Container, Form, Row } from 'react-bootstrap';
@@ -20,12 +19,11 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { Button} from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import useStore from '../../Zustand/Zustand';
-
+import { Terminos } from './Terminos';
 
 export const Registro = () => {
-   
-  const [confirmarContraseña, setConfirmarContraseña] = useState('');
-  
+
+  const [confirmarContraseña, setConfirmarContraseña] = useState(''); 
   const [modalAbierto, setModalAbierto] = useState(false);
 
   const { authenticated} = useStore();
@@ -38,12 +36,18 @@ export const Registro = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authenticated]);
 
+  const [modalAbierto2, setModalAbierto2] = useState(false);
+
   const abrirModal = () => {
-      console.log("Abriendo modal...");
+      
       setModalAbierto(true);
   };
-  const cerrarModal=() => setModalAbierto(false)
-    
+  const abrirModal2 = () => {
+      
+    setModalAbierto2(true);
+};
+  const cerrarModal=() => setModalAbierto(false)  
+  const cerrarModal2=() => setModalAbierto2(false)  
   const[formData, setFormData]= useState({
       
       documento_persona:"",
@@ -52,10 +56,10 @@ export const Registro = () => {
       email_persona:"",
       clave:"",
       telefono_persona:"",
-      domicilio_persona:"",
-      id_provincia:"",
-      localidad_persona:"",
-      id_pais:"",
+      domicilio_persona:null,
+      id_provincia:null,
+      localidad_persona:null,
+      id_pais:null,
       fecha_nacimiento_persona:"",
       id_genero:"",
       validado:false,
@@ -78,8 +82,7 @@ export const Registro = () => {
   moment.tz.setDefault('America/Buenos_Aires');
   const maxDate = new Date();
 
-
-  function validarCUIL(cuil) {
+function validarCUIL(cuil) {
     // Verificar que el CUIL tenga 11 dígitos
     // if (cuil.length !== 11 || !/^\d+$/.test(cuil)) {
     //     return false;
@@ -117,8 +120,13 @@ export const Registro = () => {
     return digitoVerificador === digitoEsperado;
 }
 
+function validarClave(clave) {
+  // La expresión regular busca al menos un número (\d) y al menos una letra mayúscula ([A-Z])
+  const regex = /^(?=.*\d)(?=.*[A-Z])/;
+  return regex.test(clave);
+}
  
-    const obtenerDatosDB= async()=>{ try {
+const obtenerDatosDB= async()=>{ try {
       const paisesDB = await cdigitalApi.get("/ciudadanoDigital/paises");
       const provinciasDB = await cdigitalApi.get("/ciudadanoDigital/provincias");
       const generosDB = await cdigitalApi.get("/ciudadanoDigital/genero");
@@ -135,7 +143,6 @@ export const Registro = () => {
     }
   }
   
-
  const handleTogglePassword = () => {
       setShowPassword(!showPassword);
       
@@ -146,9 +153,10 @@ export const Registro = () => {
 
  const handleRegister = async (e)=>{
       e.preventDefault();
-  
+      let diferenciaTiempo = maxDate.getTime() - formData.fecha_nacimiento_persona.getTime();
+      let edad = Math.floor(diferenciaTiempo / (1000 * 60 * 60 * 24 * 365));
    const cuilValidado=validarCUIL(formData.documento_persona)
-   console.log(cuilValidado) 
+
         // ! Verificar Email
         const patronEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -180,23 +188,34 @@ if( formData.clave !== confirmarContraseña){
               })
         }
 
-        if( formData.clave.length < 6){
+        if( formData.clave.length < 8){
           return Swal.fire({
               icon: 'error',
               title: '¡Ups!',
-              text: 'La clave debe tener 5 caracteres como mínimo',    
+              text: 'La clave debe tener 8 caracteres como mínimo',    
               confirmButtonColor:"#6495ED"             
             })
       }
 
-      if( formData.clave.length > 30){
+      if( formData.clave.length > 25){
         return Swal.fire({
             icon: 'error',
             title: '¡Ups!',
-            text: 'La clave debe tener 30 caracteres como máximo',    
+            text: 'La clave debe tener 25 caracteres como máximo',    
             confirmButtonColor:"#6495ED"             
           })
     }
+
+
+
+    if( !validarClave(formData.clave)){
+      return Swal.fire({
+          icon: 'error',
+          title: '¡Ups!',
+          text: 'La clave debe contener al menos una mayúscula y un número',    
+          confirmButtonColor:"#6495ED"             
+        })
+  }
 
 
  if( formData.documento_persona.length < 11){
@@ -238,22 +257,22 @@ if( formData.clave !== confirmarContraseña){
     }
 
 
-  if( formData.id_provincia == 0){
-    return Swal.fire({
-        icon: 'error',
-        title: '¡Ups!',
-        text: 'Debe seleccionar una provincia',
-        confirmButtonColor:"#6495ED"                 
-      })
-}
-if( formData.id_pais == 0){
-  return Swal.fire({
-      icon: 'error',
-      title: '¡Ups!',
-      text: 'Debe seleccionar un país',   
-      confirmButtonColor:"#6495ED"              
-    })
-}
+//   if( formData.id_provincia == 0){
+//     return Swal.fire({
+//         icon: 'error',
+//         title: '¡Ups!',
+//         text: 'Debe seleccionar una provincia',
+//         confirmButtonColor:"#6495ED"                 
+//       })
+// }
+// if( formData.id_pais == 0){
+//   return Swal.fire({
+//       icon: 'error',
+//       title: '¡Ups!',
+//       text: 'Debe seleccionar un país',   
+//       confirmButtonColor:"#6495ED"              
+//     })
+// }
 
 if( formData.id_genero == 0){
   return Swal.fire({
@@ -271,6 +290,15 @@ if( formData.id_genero == 0){
 //       confirmButtonColor:"#6495ED"                
 //     })
 // }
+
+if( edad < 14){
+  return Swal.fire({
+      icon: 'error',
+      title: '¡Ups!',
+      text: 'Debe ser mayor de 14 años para registrarse',  
+      confirmButtonColor:"#6495ED"               
+    })
+}
 
 
 try{
@@ -303,7 +331,7 @@ catch(error)
 {
 console.log(error);
 }
-console.log(formData);
+
  AgregarCiudadanoDB(formData);
 //  setFormData({
 //   documento_persona: "",
@@ -326,12 +354,19 @@ console.log(formData);
         
     }
 
-    const handleChange = (e, lon) => {
+  const  handlePaste = (e) => {
+      // Cancelar el evento para evitar que se pegue el texto
+      e.preventDefault();
+      // Puedes mostrar un mensaje o tomar otra acción aquí si lo deseas
+    }
+
+ const handleChange = (e, lon) => {
       let value = e.target.value; // Eliminar espacios en blanco alrededor del valor
       
       if (e.target.name === "id_provincia" || e.target.name === "id_pais" || e.target.name === "documento_persona" ||e.target.name==="id_genero" ) {
         value = value !== "" ? parseInt(value.slice(0, lon), 10) : ""; // Convertir a número si no está vacío
       } else if (e.target.type === "number") {
+      
         value = value.slice(0, lon); // Limitar la longitud si es necesario
       }
       
@@ -341,10 +376,11 @@ console.log(formData);
       });
     };
 
-
-    
-    
-    
+ const handleNumberKeyDown = (e) => {
+      if (e.target.type === "number" && e.key === "-") {
+        e.preventDefault();
+      }
+    };
 
  const AgregarCiudadanoDB= async (data) =>
        {
@@ -402,7 +438,7 @@ return (
 
 
 <Form.Group className="mb-3" controlId="dni">
-  <Form.Label ><strong>CUIL (sin guiones)</strong></Form.Label>
+  <Form.Label ><strong>CUIL</strong></Form.Label>
   
 
     <Form.Control
@@ -410,11 +446,13 @@ return (
       type="number"
       placeholder="Ej: 20162345686"
       onChange={(e) => handleChange(e, 11)}
+      onKeyDown={handleNumberKeyDown} 
       value={formData.documento_persona}
       name="documento_persona"
       required
       className="custom-input-number input" 
       autoFocus
+      onPaste={handlePaste}
     />
 
   
@@ -453,7 +491,7 @@ return (
   </Form.Group>
 
   <Form.Group className="mb-3" controlId="genero">
-  <Form.Label> <strong>Genero</strong> </Form.Label>
+  <Form.Label> <strong>Género</strong> </Form.Label>
   <Form.Select 
     type="number"    
     onChange={(e) => handleChange(e, 2)}
@@ -484,21 +522,11 @@ return (
       required
       value={formData.email_persona}
       className='input'
+      onPaste={handlePaste}
     />
   </Form.Group>
 
-  <Form.Group className="mb-3" controlId="celular">
-    <Form.Label> <strong>Celular</strong> </Form.Label>
-    <Form.Control
-      type="number"
-      placeholder="Ej: 3813456789"
-      name="telefono_persona"
-      onChange={(e)=>handleChange(e,10)}
-      value={formData.telefono_persona}
-      required
-      className="custom-input-number input" 
-    />
-  </Form.Group>
+ 
 </div>
 
 
@@ -522,6 +550,7 @@ return (
       maxLength={30}
       required
       className='input'
+      onPaste={handlePaste}
     />
   <div className="d-flex justify-content-end">
   {showPassword ? (
@@ -550,6 +579,7 @@ return (
       maxLength={30}
       required
       className='input'
+      onPaste={handlePaste}
     />
      <div className="d-flex justify-content-end">
   {showPassword2 ? (
@@ -568,7 +598,7 @@ return (
   </div>
   </Form.Group>
 
-  <Form.Group className="mb-3" controlId="domicilio">
+  {/* <Form.Group className="mb-3" controlId="domicilio">
     <Form.Label> <strong> Domicilio</strong></Form.Label>
     <Form.Control
       type="text"
@@ -580,9 +610,9 @@ return (
       required
       className='input'
     />
-  </Form.Group>
+  </Form.Group> */}
 
-  <Form.Group as={Row} className="mb-3" controlId="nacimiento">
+  <Form.Group  as={Row} className="mb-3" controlId="nacimiento">
     <Form.Label> <strong> Fecha de nacimiento</strong></Form.Label>
     <DatePicker
          selected={formData.fecha_nacimiento_persona}    
@@ -592,7 +622,10 @@ return (
       });} 
       
       }
-          
+      onPaste={handlePaste}
+      onKeyDown={(e) => {
+        e.preventDefault(); // Evita que se escriba en el input
+      }}  
          
           dateFormat="yyyy-MM-dd"
           showYearDropdown
@@ -604,14 +637,28 @@ return (
           locale={es}
           timeZone="America/Buenos_Aires"
           maxDate={maxDate}
-      
-          
+        
           
           
         />
   </Form.Group>
 
-  <Form.Group className="mb-3" controlId="Provincia">
+  <Form.Group className="mb-3" controlId="celular">
+    <Form.Label> <strong>Celular</strong> </Form.Label>
+    <Form.Control
+      type="number"
+      placeholder="Ej: 3813456789"
+      name="telefono_persona"
+      onChange={(e)=>handleChange(e,10)}
+      onKeyDown={handleNumberKeyDown} 
+      value={formData.telefono_persona}
+      required
+      className="custom-input-number input" 
+      onPaste={handlePaste}
+    />
+  </Form.Group>
+
+  {/* <Form.Group className="mb-3" controlId="Provincia">
   <Form.Label> <strong>Provincia</strong> </Form.Label>
   <Form.Select 
     type="number"    
@@ -629,9 +676,9 @@ return (
         </option>
       ))}
   </Form.Select>
-</Form.Group>
+</Form.Group> */}
 
-<Form.Group className="mb-3" controlId="Pais">
+{/* <Form.Group className="mb-3" controlId="Pais">
     <Form.Label> <strong>Pais</strong> </Form.Label>
     
  <Form.Select 
@@ -653,10 +700,10 @@ return (
       
       
     </Form.Select>
-  </Form.Group>
+  </Form.Group> */}
 
 
-  <Form.Group className="mb-3" controlId="Localidad">
+  {/* <Form.Group className="mb-3" controlId="Localidad">
     <Form.Label> <strong>Localidad</strong> </Form.Label>
     
  <Form.Control
@@ -673,7 +720,7 @@ return (
  />
    
    
-</Form.Group>
+</Form.Group> */}
 </div>
 )
       }
@@ -690,19 +737,19 @@ return (
   </div>
 
 </Col>
-<div className=" mt-4 ">
-        <Form.Check
-          type="checkbox"
-          id="default-checkbox"
-          label="Acepto los términos y condiciones"
-          required
-          
-          bsPrefix="custom-checkbox" 
-         
-          
-        />
-        
-      </div>
+<div className="mt-4">
+  <Form.Check
+    type="checkbox"
+    id="default-checkbox"
+    label={
+      <Form.Check.Label>
+        Acepto los <a className='text-blue' style={{ cursor: 'pointer' }} onClick={abrirModal2}>términos y condiciones</a>
+      </Form.Check.Label>
+    }
+    required
+    bsPrefix="custom-checkbox"
+  />
+</div>
 
    
 </Row>
@@ -734,11 +781,19 @@ return (
 
 {modalAbierto && (
   <Validacion 
-  data={formData}
+  email={formData.email_persona}
   cerrarModal={cerrarModal}
   setModalAbierto={setModalAbierto}
   />
-)}       
+)}    
+
+{modalAbierto2 && (
+  <Terminos
+  
+  cerrarModal={cerrarModal2}
+ 
+  />
+)} 
            
     
     </>
