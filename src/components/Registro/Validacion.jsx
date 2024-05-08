@@ -44,7 +44,7 @@ const ValidarCiudadanoDB = async () => {
   
               setTimeout(() => {
                   // navigate("/");
-                  window.location.href = "http://localhost:5173/";
+                  window.location.href = `http://181.105.6.205:90/?rep=${localStorage.getItem("reparticion")}`;
               }, 2500);
 
 
