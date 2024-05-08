@@ -241,13 +241,26 @@ const Turnos = () => {
                     }}
 
                   />
-                  <TextField
+                  {/* <TextField
                     readOnly
                     // eslint-disable-next-line react/prop-types
                     className='my-3'
                     value={user.domicilio_persona}
                     // onChange={handleChange}
                     label="Domicilio"
+                    type="text"
+                    name="descripcion"
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+
+                  /> */}
+                      <TextField
+                    readOnly
+                    // eslint-disable-next-line react/prop-types
+                    value={user.email_persona}
+                    label="Email"
+                    className='my-3'
                     type="text"
                     name="descripcion"
                     InputLabelProps={{
@@ -293,18 +306,7 @@ const Turnos = () => {
                     }}
 
                   />
-                  <TextField
-                    readOnly
-                    // eslint-disable-next-line react/prop-types
-                    value={user.email_persona}
-                    label="Email"
-                    type="text"
-                    name="descripcion"
-                    InputLabelProps={{
-                      shrink: true,
-                    }}
-
-                  />
+              
                 </div>
 
               </div>
