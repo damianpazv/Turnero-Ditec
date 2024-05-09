@@ -43,7 +43,7 @@ export default function NavBar() {
   }, []);
 
   return (
-    <>
+    <div className="ocultarAlImprimir">
       {authenticated ? (
         <Box sx={{ flexGrow: 1 }}>
           <AppBar position="static">
@@ -104,6 +104,6 @@ export default function NavBar() {
       ) : (
         <></>
       )}
-    </>
+    </div>
   );
 }

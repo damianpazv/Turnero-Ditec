@@ -219,7 +219,7 @@ const Turnos = () => {
                 <div className="d-flex flex-column my-2">
                   <TextField
                     readOnly
-                    className='mb-3'
+                    className='mb-3 deshabilitarInputsTurno'
                     // eslint-disable-next-line react/prop-types
                     value={user.nombre_persona}
                     label="Nombre"
@@ -232,6 +232,7 @@ const Turnos = () => {
                     readOnly
                     // eslint-disable-next-line react/prop-types
                     value={user.apellido_persona}
+                    className='deshabilitarInputsTurno'
                     // onChange={handleChange}
                     label="Apellido"
                     type="text"
@@ -260,7 +261,7 @@ const Turnos = () => {
                     // eslint-disable-next-line react/prop-types
                     value={user.email_persona}
                     label="Email"
-                    className='my-3'
+                    className='my-3 deshabilitarInputsTurno'
                     type="text"
                     name="descripcion"
                     InputLabelProps={{
@@ -276,7 +277,7 @@ const Turnos = () => {
 
                   <TextField
                     readOnly
-                    className='mb-3'
+                    className='mb-3 deshabilitarInputsTurno'
                     // eslint-disable-next-line react/prop-types
                     value={user.telefono_persona}
                     // onChange={handleChange}
@@ -290,7 +291,7 @@ const Turnos = () => {
                   />
                   <TextField
                     readOnly
-                    className='mb-3'
+                    className='mb-3 deshabilitarInputsTurno'
                     // eslint-disable-next-line react/prop-types
                     value={user.documento_persona}
                     onChange={(e) => {
@@ -315,7 +316,7 @@ const Turnos = () => {
                 <div className='col-md-5 turnoAsignado'>
                   <TextField
                     readOnly
-                    className='mb-3'
+                    className='mb-3 deshabilitarInputsTurno'
                     // eslint-disable-next-line react/prop-types
                     value={values.fecha}
                     onChange={(e) => {
@@ -332,7 +333,7 @@ const Turnos = () => {
 
                   />
                   <TextField
-                  className=''
+                  className='deshabilitarInputsTurno'
                     readOnly
                     // eslint-disable-next-line react/prop-types
                     value={values.hora}
@@ -346,9 +347,9 @@ const Turnos = () => {
                   />
                   <div className='btnTurno'> 
 
-                    <Button onClick={imprimirTurno} disabled={botonState} className='my-3' variant="outlined">Imprimir Turno</Button>
-                    <Button onClick={anularTurno} disabled={botonState} className='my-3 ' variant="outlined">Cancelar Turno</Button>
-                    <Button onClick={nuevoTurno} disabled={botonState} className='my-3 ' variant="outlined">Nuevo Turno</Button>
+                    <Button onClick={imprimirTurno} disabled={botonState} className='my-3' variant="contained">Imprimir Turno</Button>
+                    <Button onClick={anularTurno} disabled={botonState} className='my-3 mx-2 mx-md-0' variant="contained">Cancelar Turno</Button>
+                    <Button onClick={nuevoTurno} disabled={botonState} className='my-3 ' variant="contained">Nuevo Turno</Button>
                   </div>
                 </div>
               }
@@ -433,7 +434,7 @@ const Turnos = () => {
                   {
                     !bandera && values.fecha != "" ?
                       <>
-                        <InputLabel className='text-black'>Horas disponibles</InputLabel>
+                        <InputLabel className='text-black mt-2 mt-md-0'>Horas disponibles</InputLabel>
 
                         <Select
                           // eslint-disable-next-line react/prop-types
