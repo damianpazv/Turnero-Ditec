@@ -37,7 +37,7 @@ const ValidarCiudadanoDB = async () => {
               Swal.fire({
                   position: "center",
                   icon: "success",
-                  title: `¡Código correcto! Registro validado.`,
+                  title: `Código correcto! Registro validado!`,
                   showConfirmButton: false,
                   timer: 2000
               });
@@ -75,6 +75,16 @@ const ValidarCiudadanoDB = async () => {
           }
       } catch (error) {
           console.log(error);
+         
+            Swal.fire({
+              position: "center",
+              icon: "error",
+              title: `¡Ups! `,
+              text:"Algo salió mal!",
+              showConfirmButton: false,
+              timer: 1500
+            });
+          
       }
   }
   
@@ -100,6 +110,7 @@ const ValidarCiudadanoDB = async () => {
 
 
 <ModalBody>
+  <p>* Si no recibió el email revise la casilla de spam</p>
 
 <Form  onSubmit={validar} className='m-1 p-3 '>
   

@@ -6,7 +6,7 @@ import {  Col, Container, Form, Row } from 'react-bootstrap';
 //import logo from '../assets/logo1.png';
 import logo2 from '../../assets/Logo_SMT_neg_4.png';
 import logo3 from '../../assets/Logo_SMT_neg_3.png';
-import { FaEye, FaEyeSlash} from "react-icons/fa";
+import { FaEye, FaEyeSlash,FaCalendar} from "react-icons/fa";
 import { Validacion } from './Validacion';
 import cdigitalApi from '../../config/axios';
 import { useEffect } from 'react';
@@ -158,7 +158,11 @@ const obtenerDatosDB= async()=>{ try {
    const cuilValidado=validarCUIL(formData.documento_persona)
 
         // ! Verificar Email
-        const patronEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // const patronEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const patronEmail =/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com|net|org|gov|edu|info)$/i
+
+
+        ;
 
         if(!cuilValidado){
           return Swal.fire({
@@ -381,27 +385,82 @@ console.log(error);
         e.preventDefault();
       }
     };
+    
+    const handleKeyDown = (e) => {
+      const input = e.target;
+      const { selectionStart } = input;
+      // Permite la eliminación de los guiones
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (selectionStart === 3 || selectionStart === 6) {
+          e.preventDefault();
+          const newValue = input.value.slice(0, selectionStart - 1) + input.value.slice(selectionStart);
+          input.value = newValue;
+          // Restaura la posición del cursor
+          input.setSelectionRange(selectionStart - 1, selectionStart - 1);
+        }
+      }
+    };
 
+
+
+    const handleChangeRaw = (e) => {
+      const input = e.target.value;
+      const maxLength = 11; // Longitud máxima de la fecha completa "dd-mm-aaaa"
+      
+      // Evita realizar más modificaciones si ya se alcanzó la longitud máxima
+      if (input.length === maxLength) {
+        e.preventDefault();
+        return;
+      }
+  
+      let formattedDate = input;
+      // Inserta automáticamente un guión después de los primeros dos dígitos
+      if (input.length === 2 && input.charAt(1) !== '-') {
+        formattedDate += '-';
+      }
+      // Inserta automáticamente un guión después de los siguientes dos dígitos
+      if (input.length === 5 && input.charAt(4) !== '-') {
+        formattedDate += '-';
+      }
+      // Actualiza el valor del input con el formato deseado
+      e.target.value = formattedDate;
+  };
+  
  const AgregarCiudadanoDB= async (data) =>
        {
        
            try{
-               await cdigitalApi.post("/usuarios/registro",data);
+             const resp=  await  cdigitalApi.post("/usuarios/registro",data);
                
-               Swal.fire({
-                position: "center",
-                icon: "success",
-                title: `Formulario enviado! Pendiente de validación `,
-                showConfirmButton: false,
-                timer: 2500
-              });
-              abrirModal();
+          
+
+              if(resp.data.ok) return abrirModal();
+
+              else {
+                Swal.fire({
+                  position: "center",
+                  icon: "error",
+                  title: `¡Ups! `,
+                  text:"Algo salió mal!",
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+              
              
            }
        
            catch(error)
            {
            console.log(error);
+           Swal.fire({
+            position: "center",
+            icon: "error",
+            title: `¡Ups! `,
+            text:"Algo salió mal!",
+            showConfirmButton: false,
+            timer: 1500
+          });
            }
     }
 
@@ -453,6 +512,7 @@ return (
       className="custom-input-number input" 
       autoFocus
       onPaste={handlePaste}
+     
     />
 
   
@@ -542,7 +602,7 @@ return (
   <Form.Label> <strong>Clave</strong> </Form.Label>
     <Form.Control
      type={showPassword ? 'text' : 'password'}
-      placeholder='Escriba una clave '
+      placeholder='Escriba una clave'
       name="clave"
       onChange={handleChange}
       value={formData.clave}
@@ -551,6 +611,7 @@ return (
       required
       className='input'
       onPaste={handlePaste}
+      title="* La clave debe tener al menos 8 caracteres y debe contener al menos una mayúscula y un número"
     />
   <div className="d-flex justify-content-end">
   {showPassword ? (
@@ -623,24 +684,33 @@ return (
       
       }
       onPaste={handlePaste}
-      onKeyDown={(e) => {
-        e.preventDefault(); // Evita que se escriba en el input
-      }}  
+      // onKeyDown={(e) => {
+      //   e.preventDefault(); // Evita que se escriba en el input
+      // }}  
          
-          dateFormat="yyyy-MM-dd"
+          // dateFormat="yyyy-MM-dd"
+          dateFormat="dd-MM-yyyy"
           showYearDropdown
          scrollableYearDropdown
           yearDropdownItemNumber={100}
-          placeholderText="Selecciona una fecha"
+          placeholderText="Ej: 12-05-1990"
           className="form-control input "
           required
           locale={es}
           timeZone="America/Buenos_Aires"
           maxDate={maxDate}
+          onChangeRaw={handleChangeRaw}
+          onKeyDown={handleKeyDown}
         
           
           
         />
+        
+    <div className="d-flex justify-content-end">
+  <FaCalendar
+  className='calendar'/>
+  </div>
+
   </Form.Group>
 
   <Form.Group className="mb-3" controlId="celular">
