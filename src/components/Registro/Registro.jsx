@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef, useRef, useState } from 'react'
 import './registro.css';
 import Swal from 'sweetalert2';
 import {  Col, Container, Form, Row } from 'react-bootstrap';
@@ -72,7 +72,7 @@ export const Registro = () => {
   const [provincias,setProvincias] = useState([]);
   const [generos,setGeneros] = useState([]);
   const [tipoDocumento,setTipoDocumento] = useState([]);
-  
+  const datePickerRef = useRef(null);
 
   useEffect(() => {
  
@@ -408,18 +408,18 @@ console.log(error);
       const maxLength = 11; // Longitud máxima de la fecha completa "dd-mm-aaaa"
       
       // Evita realizar más modificaciones si ya se alcanzó la longitud máxima
-      if (input.length === maxLength) {
+      if (input?.length === maxLength) {
         e.preventDefault();
         return;
       }
   
       let formattedDate = input;
       // Inserta automáticamente un guión después de los primeros dos dígitos
-      if (input.length === 2 && input.charAt(1) !== '-') {
+      if (input?.length === 2 && input.charAt(1) !== '-') {
         formattedDate += '-';
       }
       // Inserta automáticamente un guión después de los siguientes dos dígitos
-      if (input.length === 5 && input.charAt(4) !== '-') {
+      if (input?.length === 5 && input.charAt(4) !== '-') {
         formattedDate += '-';
       }
       // Actualiza el valor del input con el formato deseado
@@ -673,7 +673,7 @@ return (
     />
   </Form.Group> */}
 
-  <Form.Group  as={Row} className="mb-3" controlId="nacimiento">
+  <Form.Group  as={Row}  controlId="nacimiento">
     <Form.Label> <strong> Fecha de nacimiento</strong></Form.Label>
     <DatePicker
          selected={formData.fecha_nacimiento_persona}    
@@ -701,13 +701,17 @@ return (
           maxDate={maxDate}
           onChangeRaw={handleChangeRaw}
           onKeyDown={handleKeyDown}
-        
+          ref={datePickerRef}
           
           
         />
         
     <div className="d-flex justify-content-end">
   <FaCalendar
+  onClick={() => {
+    // Abre el calendario cuando se hace clic en el icono de calendario
+    datePickerRef.current.setOpen(true);
+  }}
   className='calendar'/>
   </div>
 
