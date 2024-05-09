@@ -3,6 +3,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import es from 'date-fns/locale/es'; // Importa las traducciones al español
 import { formatFecha } from '../../utils/mostrarFecha';
+import { IoCalendarNumberSharp } from "react-icons/io5";
+import "./Fechas.css"
 
 const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setValues}) => {
   const [availableDates, setAvailableDates] = useState(fechasHabilitadas);
@@ -47,7 +49,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
   
   return (
     
-    <div className='d-md-flex justify-content-center' onClick={handleInputClick}>
+    <div className='d-md-flex justify-content-center contenedorIconoFecha' onClick={handleInputClick}>
       <DatePicker
         className='mt-2 inputDatePicker text-center'
         includeDates={availableDates}
@@ -61,6 +63,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
          open={flag}
          locale={es} // Establece el idioma a español
       />
+      <IoCalendarNumberSharp className='iconoCalendarTurno'  size={20}/>
     </div>
   );
 };

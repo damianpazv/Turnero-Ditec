@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import './imprimirTurno.css'
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from '../../config/axios';
 import { Box, CircularProgress } from '@mui/material';
+import { IoMdArrowBack } from "react-icons/io";
 
 const ImprimirTurno = () => {
 
@@ -61,11 +62,19 @@ const ImprimirTurno = () => {
 
     }
 
+    const navigate = useNavigate();
+    const volverTurnero = () =>{
+        navigate("/turnos")
+    }
+
     return (
         <>
             {
                 turnoValido ?
                     <div>
+                        <div className='ocultarAlImprimir'>
+                            <IoMdArrowBack className='volverTurnos' onClick={volverTurnero} />
+                        </div>
                         <div className='cont container-fluid w-100 d-md-none mt-5'>
                             <div className='imprimir'>
                                 <h3>MUNICIPALIDAD DE SAN MIGUEL DE TUCUMAN</h3>
