@@ -22,3 +22,8 @@
     justify-content: space-around;
     
 }
+
+.deshabilitarInputsTurno {
+    pointer-events: none;
+  }
+  

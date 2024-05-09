@@ -1,0 +1,19 @@
+.contenedorIconoFecha{
+    position: relative;
+   
+}
+
+.iconoCalendarTurno{
+    left: 305px;
+    bottom: 18px;
+    color: #23242a;
+    cursor: pointer;
+    position: absolute;
+    z-index: 30;
+}
+
+@media (max-width: 968px) {
+    .iconoCalendarTurno{
+        left: 250px;
+    }
+}

@@ -3,7 +3,7 @@ import { TextareaAutosize as BaseTextareaAutosize } from '@mui/base/TextareaAuto
 import { styled } from '@mui/system';
 
 export default function ObservacionesTramitesTextArea({valor}) {
-  return <TextareaAutosize readOnly value={valor} aria-label="empty textarea" placeholder="Observación trámite" />
+  return <TextareaAutosize readOnly value={valor} aria-label="empty textarea" placeholder="Observación del trámite" />
 }
 
 const blue = {
