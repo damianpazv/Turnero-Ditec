@@ -9,6 +9,7 @@ import AnularTurnoModal from './AnularTurnoModal';
 import ObservacionesTramitesTextArea from './ObservacionesTramite';
 import { useNavigate } from 'react-router-dom';
 import CampoAdicionalTurno from './CampoAdicionalTurno';
+import { formatFecha } from '../../utils/mostrarFecha';
 
 const Turnos = () => {
 
@@ -318,7 +319,7 @@ const Turnos = () => {
                     readOnly
                     className='mb-3 deshabilitarInputsTurno'
                     // eslint-disable-next-line react/prop-types
-                    value={values.fecha}
+                    value={formatFecha(values.fecha)}
                     onChange={(e) => {
                       // Filtra solo los caracteres numéricos
                       const numericValue = e.target.value.replace(/\D/g, "");
@@ -488,8 +489,8 @@ const Turnos = () => {
             }
 
           </form>
-          <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} setValues={setValues} confirmarTurno={confirmarTurno} tramiteSelected={tramiteSelected} setNotificacion={setNotificacion}/>
-          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno}/>
+          <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} setValues={setValues} confirmarTurno={confirmarTurno} tramiteSelected={tramiteSelected} setNotificacion={setNotificacion} botonState={botonState}/>
+          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno} botonState={botonState}/>
         </div>
 
         {

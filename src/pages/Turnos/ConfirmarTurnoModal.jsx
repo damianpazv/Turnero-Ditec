@@ -17,7 +17,7 @@ const style = {
   p: 4,
 };
 
-export default function ConfirmarTurnoModal({open, setOpen,values,setValues,confirmarTurno,tramiteSelected,setNotificacion}) {
+export default function ConfirmarTurnoModal({open, setOpen,values,setValues,confirmarTurno,tramiteSelected,setNotificacion,botonState}) {
 //   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -57,8 +57,8 @@ const confirmarTurnoModal = ()=>{
             Hora: {values.hora}
           </Typography>
           </div>
-          <div className='mt-3'>
-          <Button onClick={confirmarTurnoModal} className='me-5'>Confirmar</Button>
+          <div className='mt-3 d-flex justify-content-around'>
+          <Button disabled={botonState} onClick={confirmarTurnoModal} className='me-5'>Confirmar</Button>
           <Button onClick={handleClose}>Cancelar</Button>
           </div>
         </Box>

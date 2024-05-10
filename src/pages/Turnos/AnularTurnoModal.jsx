@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import ConfirmarAnularTurnoModal from './ConfirmarAnularTurnoModal';
+import { useEffect } from 'react';
+import { useState } from 'react';
 
 const style = {
     position: 'absolute',
@@ -18,13 +21,23 @@ const style = {
     p: 4,
 };
 
-export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values, imprimirTurno }) {
-    //   const [open, setOpen] = React.useState(false);
+export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values, imprimirTurno, botonState }) {
+      const [open, setOpen] = useState(false);
+      const [AnularTurnoModal, setAnularTurnoModal] = useState(false);
     //   const handleOpen = () => setOpen(true);
     const handleClose = () => {
-        anularTurno()
-        setOpenAnularTurno(false)
+        setOpen(true);
     };
+
+    useEffect(() => {
+   if(AnularTurnoModal){
+       anularTurno();
+       setOpen(false);
+       setOpenAnularTurno(false);
+       setAnularTurnoModal(false);
+   }
+    }, [AnularTurnoModal])
+    
 
     const formatFechaTurno = (fecha) => {
         // Convertir la fecha a un objeto de fecha en JavaScript
@@ -74,13 +87,14 @@ export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, 
                             Hora: {values.hora}
                         </Typography>
                     </div>
-                    <div className='mt-3'>
-                        <Button onClick={ handleClose } className='me-3'>Cancelar Turno</Button>
+                    <div className='mt-3 d-flex justify-content-around'>
+                        <Button disabled={botonState} onClick={ handleClose } className='me-3'>Cancelar Turno</Button>
                         <Button onClick={imprimirTurno} className='me-3'>imprimir</Button>
 
                     </div>
                 </Box>
             </Modal>
+            <ConfirmarAnularTurnoModal open={open} setAnularTurnoModal={setAnularTurnoModal} setOpen={setOpen}/>
         </div>
     );
 }
