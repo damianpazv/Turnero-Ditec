@@ -393,7 +393,7 @@ const Turnos = () => {
                       <>
                         <InputLabel className='text-black ms-md-5 ps-md-2'>Fechas disponibles</InputLabel>
 
-                        <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values={values} setValues={setValues} />
+                        <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values={values} setValues={setValues} botonState={botonState}/>
 
                         {/* <TextField
                         label="Fecha"
@@ -443,7 +443,7 @@ const Turnos = () => {
                           onChange={handleChangeSelectHora}
                           name="hora"
                           // required
-                          disabled={tramites.length === 0 && bandera}
+                          disabled={tramites.length === 0 || botonState}
                           className="mt-2"
                           // label="Trámite"
                           style={{ width: '100%' }} // Ancho completo en dispositivos pequeños

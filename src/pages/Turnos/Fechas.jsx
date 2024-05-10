@@ -6,7 +6,7 @@ import { formatFecha } from '../../utils/mostrarFecha';
 import { IoCalendarNumberSharp } from "react-icons/io5";
 import "./Fechas.css"
 
-const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setValues}) => {
+const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setValues, botonState}) => {
   const [availableDates, setAvailableDates] = useState(fechasHabilitadas);
   const [dateSelected,setDateSelected] = useState(null)
 
@@ -62,6 +62,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
          readOnly
          open={flag}
          locale={es} // Establece el idioma a español
+         disabled={botonState}
       />
       <IoCalendarNumberSharp className='iconoCalendarTurno'  size={20}/>
     </div>
