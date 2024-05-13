@@ -448,9 +448,9 @@ export const Registro = () => {
         </div>
       </header>
 
-      <h1 className=" text-center mt-3 titulo">Registro del ciudadano</h1>
+      <h1 className=" text-center mt-4 titulo">Registro del Ciudadano Digital</h1>
 
-      <Container fluid className="mt-4 mb-5 pb-2">
+      <Container fluid className="mt-4 mb-4 pb-5">
         <Row className="justify-content-center ">
           <Col xs={12} md={8} className="mt-2 pt-3 main mb-3 pb-3">
             <Form onSubmit={handleRegister} className="m-1 p-3 ">
