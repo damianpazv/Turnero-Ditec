@@ -51,7 +51,7 @@ const DatePickerComponent = ({fechasHabilitadas, handleInputChange,values, setVa
     
     <div className='d-md-flex justify-content-center contenedorIconoFecha' onClick={handleInputClick}>
       <DatePicker
-        className='mt-2 inputDatePicker text-center'
+        className='mt-2 inputDatePicker text-center inputsSacarTurnoFecha'
         includeDates={availableDates}
         placeholderText="Seleccione una fecha"
         selected={dateSelected}
