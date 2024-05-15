@@ -21,7 +21,7 @@ const style = {
     p: 4,
 };
 
-export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values, imprimirTurno, botonState }) {
+export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, anularTurno,values, imprimirTurno, botonState, cambiarTurno }) {
       const [open, setOpen] = useState(false);
       const [AnularTurnoModal, setAnularTurnoModal] = useState(false);
     //   const handleOpen = () => setOpen(true);
@@ -88,9 +88,9 @@ export default function AnularTurnoModal({ openAnularTurno, setOpenAnularTurno, 
                         </Typography>
                     </div>
                     <div className='mt-3 d-flex justify-content-around'>
-                        <Button disabled={botonState} onClick={ handleClose } className='me-3'>Cancelar Turno</Button>
-                        <Button onClick={imprimirTurno} className='me-3'>imprimir</Button>
-
+                        <Button variant='contained' disabled={botonState} onClick={ handleClose } className='me-3'>Cancelar</Button>
+                        <Button variant='contained' onClick={imprimirTurno} className='me-3'>imprimir</Button>
+                        <Button  variant='contained' onClick={cambiarTurno} className='me-3'>Cambiar</Button>
                     </div>
                 </Box>
             </Modal>

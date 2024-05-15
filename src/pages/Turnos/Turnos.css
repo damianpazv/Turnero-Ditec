@@ -27,3 +27,11 @@
     pointer-events: none;
   }
   
+  .inputsSacarTurno{
+    width: 100%;
+}
+  @media (min-width: 770px) and (max-width: 970px) {
+    .inputsSacarTurno{
+        width: 80%;
+    }
+}

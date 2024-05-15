@@ -13,12 +13,14 @@ import { formatFecha } from '../../utils/mostrarFecha';
 
 const Turnos = () => {
 
-  const { user, authenticated, loading } = useStore();
+  const { user, authenticated, loading, logout } = useStore();
+  const navigate = useNavigate()
 
   const [tramites, setTramites] = useState([])
   const [turnosPorDia, setTurnosPorDia] = useState([]);
   const [turnosPorHora, setTurnosPorHora] = useState([]);
   const [botonState, setBotonState] = useState(false)
+  const [cambiarTurnoNoti, setcambiarTurnoNoti] = useState(false);
 
   const [notificacion, setNotificacion] = useState({ mensaje: "", tipo: "" });
 
@@ -47,6 +49,11 @@ const Turnos = () => {
     setValues({ ...values, [e.target.name]: e.target.value });
   }
 
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+  
   const obtenerTramites = async () => {
     try {
       const { data } = await axios.get(`/turnos/listarTramites?reparticion_id=${localStorage.getItem("reparticion")}`)
@@ -54,6 +61,9 @@ const Turnos = () => {
       setTramites(data.tramites)
     } catch (error) {
       console.log(error);
+      if(error?.response?.status== 401){
+        handleLogout();
+      }
     }
   }
 
@@ -83,7 +93,11 @@ const Turnos = () => {
 
       } catch (error) {
         console.log("mal");
+        // console.log(error.response.status);
         setNotificacion({ mensaje: error.response.data?.message || error.message, tipo: "error" });
+        if(error?.response?.status== 401){
+          handleLogout();
+        }
       }
     } else {
       setNotificacion({ mensaje: "Debe seleccionar un trámite", tipo: "error" });
@@ -101,6 +115,7 @@ const Turnos = () => {
 
       if (resultado.data.length == 0) {
         setNotificacion({ mensaje: "El trámite ingresado no tiene turnos disponibles", tipo: "error" });
+        setcambiarTurnoNoti(false);
         setBandera(false);
         return;
       }
@@ -123,6 +138,9 @@ const Turnos = () => {
     } catch (error) {
       console.log(error);
       console.log("mal");
+      if(error?.response?.status== 401){
+        handleLogout();
+      }
     }
 
   };
@@ -135,11 +153,16 @@ const Turnos = () => {
       setTurnosPorHora(resultado.data);
       if (resultado.data.length == 0) {
         setNotificacion({ mensaje: "No hay turnos disponibles para la fecha ingresada", tipo: "error" });
+        setcambiarTurnoNoti(false);
         setBandera(false);
+        return;
       }
 
     } catch (error) {
       console.log(error);
+      if(error?.response?.status== 401){
+        handleLogout();
+      }
     }
     setBandera(false);
   }
@@ -165,7 +188,12 @@ const Turnos = () => {
       const { data } = await axios.post("/turnos/confirmarTurno", { cuil: user.documento_persona, id_tramite: values.tramite, apellido: user.apellido_persona, nombre: user.nombre_persona, fecha_solicitada: values.fecha, hora_solicitada: values.hora, email: user.email_persona, nombre_tramite: tramiteSelected.nombre_tramite, adicional: values.adicional });
     
       if (Object.values(data)[0] == 0) {
-        setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora", tipo: "error" });
+            if(cambiarTurnoNoti){
+            setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora.\nSu turno anterior sigue vigente", tipo: "error" });
+            setcambiarTurnoNoti(false);
+            }else{
+              setNotificacion({ mensaje: "El turno ya no esta disponible.. Seleccione otra fecha/hora", tipo: "error" });
+            }
       } else {
 
         setOperacionExitosa(Object.values(data)[0]);
@@ -174,6 +202,9 @@ const Turnos = () => {
       }
     } catch (error) {
       console.log(error);
+      if(error?.response?.status== 401){
+        handleLogout();
+      }
     }
       setBotonState(false);
   }
@@ -188,6 +219,9 @@ const Turnos = () => {
       setOperacionExitosa(undefined)
     } catch (error) {
       console.log(error);
+      if(error?.response?.status== 401){
+        handleLogout();
+      }
     }
     setBotonState(false)
   }
@@ -199,12 +233,16 @@ const Turnos = () => {
     setBotonState(false)
   }
 
-  const navigate = useNavigate()
-
   const imprimirTurno = () => {
   // const props = { user: user, values: values, tramite:tramiteSelected };
   // navigate("/imprimirTurno",{state:props})
   navigate(`/imprimirTurno?cuil=${user.documento_persona}&tramite=${tramiteSelected.nombre_tramite}&id_tramite=${values.tramite}`);
+  }
+
+  const cambiarTurno = () =>{
+    setcambiarTurnoNoti(true);
+    setOpenAnularTurno(false);
+    obtenerTurnosPorDia();
   }
 
   return (
@@ -357,7 +395,7 @@ const Turnos = () => {
             </div>
             {operacionExitosa != 1 &&
 
-            <>
+            <div>
             
               <div className='row mb-2'>
                 <div className='col-md-4'>
@@ -369,9 +407,9 @@ const Turnos = () => {
                     name="tramite"
                     required
                     disabled={bandera || tramites.length == 0}
-                    className="mt-2"
+                    className="mt-2 inputsSacarTurno"
                     // label="Trámite"
-                    style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
+                    // style={{ width: '100%' }}
                   >
                     {tramites.length > 0 &&
                       tramites.map((st, index) => (
@@ -391,7 +429,7 @@ const Turnos = () => {
                   {
                     !bandera && values.fecha != "" ?
                       <>
-                        <InputLabel className='text-black ms-md-5 ps-md-2'>Fechas disponibles</InputLabel>
+                        <InputLabel className='text-black ms-lg-5 ps-md-2'>Fechas disponibles</InputLabel>
 
                         <DatePickerComponent fechasHabilitadas={fechasHabilitadas} handleInputChange={handleInputChange} values={values} setValues={setValues} botonState={botonState}/>
 
@@ -420,7 +458,7 @@ const Turnos = () => {
                       // </Box>
                       <div className='d-md-flex justify-content-center'>
 
-                        <Box className="mt-3" sx={{ width: 300 }}>
+                        <Box className="mt-3" sx={{ width: 200 }}>
                           <Skeleton />
                           <Skeleton animation="wave" />
                           <Skeleton animation={false} />
@@ -444,9 +482,9 @@ const Turnos = () => {
                           name="hora"
                           // required
                           disabled={tramites.length === 0 || botonState}
-                          className="mt-2"
+                          className="mt-2 inputsSacarTurno"
                           // label="Trámite"
-                          style={{ width: '100%' }} // Ancho completo en dispositivos pequeños
+                          // style={{ width: '100%' }} 
                         >
                           {turnosPorHora.length > 0 && turnosPorHora.map((st, index) => (
                             <MenuItem key={index} value={st.hora_turno}>
@@ -460,7 +498,7 @@ const Turnos = () => {
                       // <Box className="d-flex justify-content-center mt-5">
                       //   <CircularProgress />
                       // </Box>
-                      <Box className="mt-3" sx={{ width: {xs:300, md:400} }}>
+                      <Box className="mt-3" sx={{ width: {xs:200, lg:400} }}>
                         <Skeleton />
                         <Skeleton animation="wave" />
                         <Skeleton animation={false} />
@@ -484,13 +522,13 @@ const Turnos = () => {
                 }
                 </div>
               }
-            </>
+            </div>
 
             }
 
           </form>
           <ConfirmarTurnoModal open={open} setOpen={setOpen} values={values} setValues={setValues} confirmarTurno={confirmarTurno} tramiteSelected={tramiteSelected} setNotificacion={setNotificacion} botonState={botonState}/>
-          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno} botonState={botonState}/>
+          <AnularTurnoModal openAnularTurno={openAnularTurno} setOpenAnularTurno={setOpenAnularTurno} anularTurno={anularTurno} values={values} imprimirTurno={imprimirTurno} botonState={botonState} cambiarTurno = {cambiarTurno}/>
         </div>
 
         {

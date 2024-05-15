@@ -17,3 +17,22 @@
         left: 250px;
     }
 }
+
+
+  @media (min-width: 770px) and (max-width: 987px) {
+    .inputsSacarTurnoFecha{
+        width: 80%;
+    }
+    .iconoCalendarTurno{
+        left: 140px;
+    }
+}
+
+@media (min-width: 988px) and (max-width: 1200px) {
+    .inputsSacarTurnoFecha{
+        width: 80%;
+    }
+    .iconoCalendarTurno{
+        left: 180px;
+    }
+}
