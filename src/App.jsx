@@ -13,29 +13,41 @@ import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
 
 function App() {
   const url = new URL(window.location.href);
-  const logout = url.searchParams.get("logout");
 
   const queryString = window.location.search;
   const params = new URLSearchParams(queryString);
   const reparti = params.get('rep');
-  localStorage.setItem("reparticion", reparti? reparti : 1711);
+  console.log(reparti);
 
-  url.searchParams.delete("logout");
-  history.replaceState(null, '', url.toString());
-
-  if(logout){
-    localStorage.removeItem("token");
+  if(localStorage.getItem("reparticion")){
+    localStorage.setItem("reparticion", reparti != null ? reparti : localStorage.getItem("reparticion"));
+  }else if(reparti){
+    localStorage.setItem("reparticion", reparti);
   }
+
+  // AUTHENTICACION
+  const token = url.searchParams.get("auth");
+  url.searchParams.delete("auth");
+  url.searchParams.delete("rep");
+  history.replaceState(null, '', url.toString());
+  // Verificar si el token está presente en la URL y si aún no se ha guardado en el localStorage
+  if (token) {
+    localStorage.setItem("token", token);
+  } else if (!token && localStorage.getItem("token") == null) {
+    const url = new URL(`https://smt.gob.ar/`);
+    window.location.href = url.toString();
+  }
+
   return (
     <>
     <HashRouter>
         <Layout>
           <Routes>
-            <Route exact path="/*" element={<Login />} />
+            {/* <Route exact path="/*" element={<Login />} /> */}
             {/* <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} /> */}
-            <Route exact path="/turnos" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
+            <Route exact path="/*" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
             <Route exact path="/imprimirTurno" element={<PrivateRoute key="imprimirTurnos"><ImprimirTurno /></PrivateRoute>} />
-            <Route exact path="/registro" element={<Registro />} /> 
+            {/* <Route exact path="/registro" element={<Registro />} />  */}
 
             {/* <Route exact
               path="/estadistica_rrhh"

@@ -10,7 +10,7 @@ const PrivateRoute = ({ children }) => {
   useEffect(() => {
     getAuth();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []);  
 
   return loading ? (
     <Box sx={{ display: "flex" }}>
@@ -19,7 +19,8 @@ const PrivateRoute = ({ children }) => {
   ) : authenticated ? (
     children
   ) : (
-    <Navigate to="/login" />
+    // <Navigate to="/login" />
+    <></>
   );
 };
 

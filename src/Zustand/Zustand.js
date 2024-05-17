@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from '../config/axios';
 
-const useStore = create((set) => ({
+const useStore = create((set,get) => ({
   errors: "",
   setErrors: (newValues) => set(() => ({ errors: newValues })),
 
@@ -76,10 +76,12 @@ const useStore = create((set) => ({
   ,
 
   logout:() => {
-    set({authenticated: false });
     localStorage.removeItem("token");
-    localStorage.removeItem("saveChanges");
-    // localStorage.removeItem("reparticion");
+    localStorage.removeItem("reparticion");
+    set({authenticated: false });
+    // REDIRECCION DESPUES DE CERRAR SESION
+    const url = new URL(`https://smt.gob.ar/`);
+    window.location.href = url.toString();
   },
 
   getAuth: async () => {
@@ -97,6 +99,7 @@ const useStore = create((set) => ({
       });
     } catch (error) {
       set({ authenticated: false});
+      get().logout();
       localStorage.removeItem("token");
       console.log("error de auth");
       console.log(error)

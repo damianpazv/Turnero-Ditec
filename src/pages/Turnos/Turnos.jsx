@@ -51,7 +51,6 @@ const Turnos = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
   };
   
   const obtenerTramites = async () => {
