@@ -9,10 +9,6 @@ const useStore = create((set,get) => ({
 
   user: null,
 
-  permisos: [],
-  
-  opciones: [],
-
   loading: true,
   
   botonState: false,
@@ -33,45 +29,6 @@ const useStore = create((set,get) => ({
         set({errors : error.response.data?.errors?.length > 0 ?  error.response.data.errors[0].msg : error.response?.data?.message? error.response?.data.message: error.message});
     }
     set({ botonState: false });
-  },
-
-  obtenerPermisos: async (idUsuario) => {
-    try {
-      set({ errors: "" });
-      const response = await axios.get(`/usuarios/permisos/${idUsuario}`);
-      const data = response.data.usuario;
-      set({ permisos: data });
-    } catch (error) {
-      let errorMessage = "Algo salió mal :(";
-      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-        errorMessage = error.response.data.errors[0].msg;
-      } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      set({ errors: errorMessage });
-    }
-  }
-  ,
-  obtenerOpciones: async () => {
-    try {
-      set({ errors: "" });
-      const response = await axios.get("/usuarios/opciones");
-      const data = response.data;
-      console.log(response.data)
-      set({ opciones: data });
-    } catch (error) {
-      let errorMessage = "Algo salió mal :(";
-      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-        errorMessage = error.response.data.errors[0].msg;
-      } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      set({ errors: errorMessage });
-    }
   }
   ,
 
@@ -107,30 +64,10 @@ const useStore = create((set,get) => ({
     set({ loading: false});
   },
 
-  resultSearch: [],
-  setResultSearch: (item) => set(() => ({ resultSearch: [item] })),
-
-  valuesGraficos: {
-    procedimiento: "",
-    desde: "",
-    hasta: "",
-  },
-  setValuesGraficos: (newValues) => set((state) => ({ ...state, valuesGraficos: { ...state.valuesGraficos, ...newValues } })),
-
-
-  valuesCapHumano: "",
-  // eslint-disable-next-line no-unused-vars
-  setValuesCapHumano: (newValues) => set((state) => ({ valuesCapHumano: newValues })),
-
-  formFlagReclamos: true,
-  setFormFlagReclamos: () => set((state) => ({ ...state, formFlagReclamos: !state.formFlagReclamos })),
-
-  flagCategoriasFuncionarios: false,
-  setFlagCategoriasFuncionarios: () => set((state) => ({ ...state, flagCategoriasFuncionarios: !state.flagCategoriasFuncionarios })),
-
   updateUser: (newUserData) => {
     set({ user: newUserData });
   },
+  
 }))
 
 export default useStore;

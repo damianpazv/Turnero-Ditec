@@ -1,13 +1,6 @@
-import Home from "./components/Home/Home";
-import Login from "./components/Login/Login";
 import { Routes, Route, HashRouter } from "react-router-dom";
 import Layout from "./common/Layout";
-import CapitalHumano from "./pages/CapitalHumano/CapitalHumano";
-import Reclamos from "./pages/EstadisticasReclamos/Reclamos";
 import PrivateRoute from "./routes/PrivateRoute";
-import Perfil from "./pages/Perfil/Perfil";
-import { Registro } from "./components/Registro/Registro";
-import PanelAdmin from "./components/Admin/PanelAdmin";
 import Turnos from "./pages/Turnos/Turnos";
 import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
 
@@ -43,34 +36,9 @@ function App() {
     <HashRouter>
         <Layout>
           <Routes>
-            {/* <Route exact path="/*" element={<Login />} /> */}
-            {/* <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} /> */}
+   
             <Route exact path="/*" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
             <Route exact path="/imprimirTurno" element={<PrivateRoute key="imprimirTurnos"><ImprimirTurno /></PrivateRoute>} />
-            {/* <Route exact path="/registro" element={<Registro />} />  */}
-
-            {/* <Route exact
-              path="/estadistica_rrhh"
-              element={
-                <PrivateRoute key="cap-humano">
-                  <CapitalHumano />
-                </PrivateRoute>
-              }
-            />
-            <Route exact
-              path="/estadistica_ac"
-              element={
-                <PrivateRoute key="reclamos">
-                  <Reclamos />
-                </PrivateRoute>
-              }
-            /> */}
-
-            {/* <Route exact path="/perfil" element={
-            <PrivateRoute key="perfil"><Perfil /></PrivateRoute>
-            } /> */}
-
-            {/* <Route exact path="/panel_admin" element={<PanelAdmin />} /> */}
 
           </Routes>
         </Layout>
