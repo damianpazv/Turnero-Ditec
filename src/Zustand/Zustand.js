@@ -34,11 +34,17 @@ const useStore = create((set,get) => ({
 
   logout:() => {
     localStorage.removeItem("token");
+    localStorage.removeItem("tokenSet");
     localStorage.removeItem("reparticion");
     set({authenticated: false });
     // REDIRECCION DESPUES DE CERRAR SESION
-    const url = new URL(`https://smt.gob.ar/`);
-    window.location.href = url.toString();
+    // const url = new URL(`https://smt.gob.ar/`);
+    // window.location.href = url.toString();
+
+    const url = new URL(`https://ciudaddigital.smt.gob.ar/`);
+    // const url = new URL(`http://localhost:5173/`);
+    url.searchParams.append("logout", true);
+    window.open(url.toString(), '_self');
   },
 
   getAuth: async () => {

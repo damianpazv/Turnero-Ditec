@@ -24,12 +24,22 @@ function App() {
   url.searchParams.delete("rep");
   history.replaceState(null, '', url.toString());
   // Verificar si el token está presente en la URL y si aún no se ha guardado en el localStorage
-  if (token) {
+  // if (token) {
+  //   localStorage.setItem("token", token);
+  // } else if (!token && localStorage.getItem("token") == null) {
+  //   const url = new URL(`https://smt.gob.ar/`);
+  //   window.location.href = url.toString();
+  // }
+
+  if (token && !localStorage.getItem("tokenSet")) {
     localStorage.setItem("token", token);
-  } else if (!token && localStorage.getItem("token") == null) {
-    const url = new URL(`https://smt.gob.ar/`);
-    window.location.href = url.toString();
-  }
+    localStorage.setItem("tokenSet", "true"); // Establecer la bandera
+}
+if(localStorage.getItem("token") == null){
+  localStorage.removeItem("tokenSet");
+  const url = new URL(`https://smt.gob.ar/`);
+  window.location.href = url.toString();
+}
 
   return (
     <>
