@@ -35,7 +35,7 @@ const useStore = create((set,get) => ({
   logout:() => {
     localStorage.removeItem("token");
     localStorage.removeItem("tokenSet");
-    localStorage.removeItem("reparticion");
+    // localStorage.removeItem("reparticion");
     set({authenticated: false });
     // REDIRECCION DESPUES DE CERRAR SESION
     // const url = new URL(`https://smt.gob.ar/`);
@@ -44,6 +44,8 @@ const useStore = create((set,get) => ({
     const url = new URL(`https://ciudaddigital.smt.gob.ar/`);
     // const url = new URL(`http://localhost:5173/`);
     url.searchParams.append("logout", true);
+    url.searchParams.append("destino", localStorage.getItem("origen"));
+    url.searchParams.append("rep", localStorage.getItem("reparticion"));
     window.open(url.toString(), '_self');
   },
 

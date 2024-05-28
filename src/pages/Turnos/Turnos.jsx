@@ -386,8 +386,8 @@ const Turnos = () => {
                   <div className='btnTurno'> 
 
                     <Button onClick={imprimirTurno} disabled={botonState} className='my-3' variant="contained">Imprimir Turno</Button>
-                    <Button onClick={anularTurno} disabled={botonState} className='my-3 mx-2 mx-md-0' variant="contained">Cancelar Turno</Button>
-                    <Button onClick={nuevoTurno} disabled={botonState} className='my-3 ' variant="contained">Nuevo Turno</Button>
+                    <Button onClick={anularTurno} disabled={botonState} className='my-3 mx-2' variant="contained">Cancelar Turno</Button>
+                    <Button onClick={nuevoTurno} disabled={botonState} className='my-3' variant="contained">Nuevo Turno</Button>
                   </div>
                 </div>
               }
