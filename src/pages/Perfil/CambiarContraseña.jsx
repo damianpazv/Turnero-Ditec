@@ -21,7 +21,11 @@ export const CambiarContraseña = (props) => {
     });
     const [confirmarContraseña, setConfirmarContraseña] = useState('');
    
-    
+    function validarClave(clave) {
+      // La expresión regular busca al menos un número (\d) y al menos una letra mayúscula ([A-Z])
+      const regex = /^(?=.*\d)(?=.*[A-Z])/;
+      return regex.test(clave);
+    }
 
 
 
@@ -54,22 +58,31 @@ if( datos.clave_nueva !== confirmarContraseña){
                 confirmButtonColor:"#6495ED"                 
               })
         }
-if( datos.clave_nueva.length < 6){
+if( datos.clave_nueva.length < 8){
           return Swal.fire({
               icon: 'error',
               title: '¡Ups!',
-              text: 'La clave debe tener 6 caracteres como mínimo',     
+              text: 'La clave debe tener 8 caracteres como mínimo',     
               confirmButtonColor:"#6495ED"           
             })
       }
 
-if( datos.clave_nueva.length > 30){
+if( datos.clave_nueva.length > 25){
         return Swal.fire({
             icon: 'error',
             title: '¡Ups!',
             text: 'La clave debe tener 30 caracteres como máximo',    
             confirmButtonColor:"#6495ED"             
           })
+    }
+
+    if (!validarClave(datos.clave)) {
+      return Swal.fire({
+        icon: "error",
+        title: "¡Ups!",
+        text: "La clave debe contener al menos una mayúscula y un número",
+        confirmButtonColor: "#6495ED",
+      });
     }
 
 

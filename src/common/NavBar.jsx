@@ -10,11 +10,16 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import logoMuni from "../assets/Logo_SMT_neg_4.png";
+import { CambiarContraseña } from "../pages/Perfil/CambiarContraseña";
 
 export default function NavBar() {
   const { getAuth, authenticated, logout, user } =
     useStore();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [modal2Abierto, setModal2Abierto] = useState(false);
+  const abrirModal2 = () => setModal2Abierto(true);
+  
+  const cerrarModal2=() => setModal2Abierto(false);
 
   const navigate = useNavigate();
 
@@ -80,7 +85,8 @@ export default function NavBar() {
                       open={Boolean(anchorEl)}
                       onClose={handleClose}
                     >
-                        {/* <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem> */}
+                         <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem> 
+                         <MenuItem onClick={abrirModal2}>Cambiar clave</MenuItem> 
                       <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
                     </Menu>
                   </div>
@@ -104,6 +110,23 @@ export default function NavBar() {
       ) : (
         <></>
       )}
+
+{modal2Abierto && (
+  <CambiarContraseña
+ documento={user.documento_persona}
+  cerrarModal={cerrarModal2}
+  setModalAbierto={setModal2Abierto}
+  /> 
+)} 
+
+
+
+
+
+
+
+
+
     </div>
   );
 }
