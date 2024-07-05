@@ -37,11 +37,8 @@ const useStore = create((set,get) => ({
     localStorage.removeItem("tokenSet");
     // localStorage.removeItem("reparticion");
     set({authenticated: false });
-    // REDIRECCION DESPUES DE CERRAR SESION
-    // const url = new URL(`https://smt.gob.ar/`);
-    // window.location.href = url.toString();
 
-    const url = new URL(`https://ciudaddigital.smt.gob.ar/`);
+    const url = new URL(`https://ciudaddigital.smt.gob.ar/#/login`);
     // const url = new URL(`http://localhost:5173/`);
     url.searchParams.append("logout", true);
     url.searchParams.append("destino", localStorage.getItem("origen"));
@@ -51,10 +48,20 @@ const useStore = create((set,get) => ({
 
   getAuth: async () => {
     try {
-      const token = localStorage.getItem("token");
+      const url = new URL(window.location.href);
+      const tokenURL = url.searchParams.get("auth");
+
+      url.searchParams.delete("auth");
+      url.searchParams.delete("rep");
+      history.replaceState(null, "", url.toString());
+
+      const token = tokenURL? tokenURL : localStorage.getItem("token");
       if (!token) {
-        set({ loading: false});
-        return set({authenticated:false})
+        set({ loading: false });
+        // return set({ authenticated: false });
+        set({ authenticated: false });
+        localStorage.removeItem("token");
+        return get().logout();
       }
       axios.defaults.headers.common["Authorization"] = token;
       const { data } = await axios.get("/usuarios/authStatus");
