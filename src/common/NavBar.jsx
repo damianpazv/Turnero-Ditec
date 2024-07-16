@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import logoMuni from "../assets/Logo_SMT_neg_4.png";
 
 export default function NavBar() {
-  const { getAuth, authenticated, logout, user } =
+  const { getAuth, authenticated, logout, user, logoutTotem } =
     useStore();
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -38,9 +38,13 @@ export default function NavBar() {
   };
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
-    setAnchorEl(null);
+    if(localStorage.getItem("totem")){
+      logoutTotem();
+    }else{
+      logout();
+      navigate("/");
+      setAnchorEl(null);
+    }
   };
   useEffect(() => {
     getAuth();

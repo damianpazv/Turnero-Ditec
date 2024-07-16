@@ -3,6 +3,8 @@ import Layout from "./common/Layout";
 import PrivateRoute from "./routes/PrivateRoute";
 import Turnos from "./pages/Turnos/Turnos";
 import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
+import ModalCerrarSesion from "../ModalCerrarSesion";
+import { useEffect, useState } from "react";
 
 function App() {
   const url = new URL(window.location.href);
@@ -30,11 +32,32 @@ function App() {
     localStorage.setItem("origen", origen);
   }
 
+  const totem = url.searchParams.get("totem");
+
+  if(localStorage.getItem("totem")){
+    localStorage.setItem("totem", totem != null ? totem : localStorage.getItem("totem"));
+  }else if(totem){
+    localStorage.setItem("totem", totem);
+  }
+
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    let interval = 0
+    if(totem == "true" && open == false){
+      interval = setInterval(() => {
+        setOpen(true);
+      }, 15000); // 15 segundos
+  
+    }
+    return () => clearInterval(interval);
+  }, [open]);
 
   return (
     <>
     <HashRouter>
         <Layout>
+          <ModalCerrarSesion open={open} setOpen={setOpen}/>
           <Routes>
    
             <Route exact path="/*" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />

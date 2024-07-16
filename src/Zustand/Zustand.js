@@ -46,7 +46,18 @@ const useStore = create((set,get) => ({
     window.open(url.toString(), '_self');
   },
 
+   logoutTotem:() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("totem");
+
+    const url = new URL(`https://back.smt.gob.ar`);
+    // const url = new URL(`http://localhost:5173/`);
+    url.searchParams.append("logout", true);
+    window.open(url.toString(), '_self');
+},
+
   getAuth: async () => {
+
     try {
       const url = new URL(window.location.href);
       const tokenURL = url.searchParams.get("auth");
@@ -63,6 +74,13 @@ const useStore = create((set,get) => ({
         localStorage.removeItem("token");
         return get().logout();
       }
+
+      // const totemURL = url.searchParams.get("totem");  
+      // if (!totemURL) {
+      //   localStorage.removeItem("totem");
+      //   return get().logoutTotem();
+      // }
+
       axios.defaults.headers.common["Authorization"] = token;
       const { data } = await axios.get("/usuarios/authStatus");
       set({user:data.usuarioSinContraseña});
