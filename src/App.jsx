@@ -5,6 +5,7 @@ import Turnos from "./pages/Turnos/Turnos";
 import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
 import ModalCerrarSesion from "../ModalCerrarSesion";
 import { useEffect, useState } from "react";
+import useStore from "./Zustand/Zustand";
 
 function App() {
   const url = new URL(window.location.href);
@@ -41,12 +42,25 @@ function App() {
   }
 
   const [open, setOpen] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const { logoutTotem } = useStore();
+
+  const inactividad = () => {
+  
+     let timeoutid = setTimeout(() => {
+        logoutTotem();
+      }, 12000); // 12 segundos
+
+      setTimer(timeoutid);    
+  }
 
   useEffect(() => {
     let interval = 0
     if(totem == "true" && open == false){
+      clearTimeout(timer);
       interval = setInterval(() => {
         setOpen(true);
+        inactividad();
       }, 15000); // 15 segundos
   
     }
