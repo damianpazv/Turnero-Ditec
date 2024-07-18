@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import './imprimirTurno.css'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from '../../config/axios';
-import { Box, CircularProgress } from '@mui/material';
+import { Alert, Box, CircularProgress, Snackbar } from '@mui/material';
 import { IoMdArrowBack } from "react-icons/io";
 
 const ImprimirTurno = () => {
@@ -39,13 +39,19 @@ const ImprimirTurno = () => {
     }, [])
     
 
+    const [notificacion, setNotificacion] = useState({ mensaje: "", tipo: "" });
+
     useEffect(() => {
        
         if(turnoValido){
             window.print();
+            setNotificacion({ mensaje: "Espere mientras realizamos la impresión..", tipo: "warning" });
         }
       }, [turnoValido]);
 
+      const handleCloseSnackbar = () => {
+        setNotificacion({ mensaje: "", tipo: "" });
+      };
 
       const formatFechaTurno = (fecha) => {
         // Convertir la fecha a un objeto de fecha en JavaScript
@@ -125,6 +131,24 @@ const ImprimirTurno = () => {
                                 <small className='notaAlPieComprobante'>Nota: El presente comprobante cumple solo una función de recordatorio para el causante, el mismo es intransferible y carece de validez para reclamos futuros. El causante solo podrá acceder al turno si se encuentra registrado en nuestra base de datos.</small>
                             </div>
                         </div>
+
+                        {notificacion.mensaje && (
+                            <Snackbar
+                                open={!!notificacion.mensaje}
+                                autoHideDuration={6000}
+                                onClose={handleCloseSnackbar}
+                                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+                            >
+                                <Alert severity={notificacion.tipo}>
+                                    {notificacion.mensaje.split("\n").map((line, index) => (
+                                        <React.Fragment key={index}>
+                                            {line}
+                                            <br />
+                                        </React.Fragment>
+                                    ))}
+                                </Alert>
+                            </Snackbar>
+                        )}
 
                     </div>
                     : turnoValido == undefined ?
