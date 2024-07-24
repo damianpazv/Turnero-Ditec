@@ -1,64 +1,60 @@
-import Home from "./components/Home/Home";
-import Login from "./components/Login/Login";
 import { Routes, Route, HashRouter } from "react-router-dom";
 import Layout from "./common/Layout";
-import CapitalHumano from "./pages/CapitalHumano/CapitalHumano";
-import Reclamos from "./pages/EstadisticasReclamos/Reclamos";
 import PrivateRoute from "./routes/PrivateRoute";
-import Perfil from "./pages/Perfil/Perfil";
-import { Registro } from "./components/Registro/Registro";
-import PanelAdmin from "./components/Admin/PanelAdmin";
 import Turnos from "./pages/Turnos/Turnos";
 import ImprimirTurno from "./pages/Turnos/ImprimirTurno";
 
 function App() {
   const url = new URL(window.location.href);
-  const logout = url.searchParams.get("logout");
 
   const queryString = window.location.search;
   const params = new URLSearchParams(queryString);
-  const reparti = params.get('rep');
-  localStorage.setItem("reparticion", reparti? reparti : 1711);
+ 
+  // const reparti = params.get('rep');
+  // const origen = params.get('destino');
+  // console.log(reparti);
 
-  url.searchParams.delete("logout");
+  const origen = url.searchParams.get("destino");
+  const reparti = url.searchParams.get("rep");
+  console.log(url.toString()); 
+
+  if(localStorage.getItem("reparticion")){
+    localStorage.setItem("reparticion", reparti != null ? reparti : localStorage.getItem("reparticion"));
+  }else if(reparti){
+    localStorage.setItem("reparticion", reparti);
+  }
+
+  if(localStorage.getItem("origen")){
+    localStorage.setItem("origen", origen != null ? origen : localStorage.getItem("origen"));
+  }else if(origen){
+    localStorage.setItem("origen", origen);
+  }
+
+  // AUTHENTICACION
+  const token = url.searchParams.get("auth");
+  url.searchParams.delete("auth");
+  url.searchParams.delete("rep");
   history.replaceState(null, '', url.toString());
 
-  if(logout){
-    localStorage.removeItem("token");
+  if (token && !localStorage.getItem("tokenSet")) {
+    localStorage.setItem("token", token);
+    localStorage.setItem("tokenSet", "true"); // Establecer la bandera
   }
+
+  if (localStorage.getItem("token") == null || localStorage.getItem("reparticion") == null) {
+    localStorage.removeItem("tokenSet");
+    const url = new URL(`https://ciudaddigital.gob.ar/?rep=${localStorage.getItem("reparticion")}&destino=${localStorage.getItem("origen")}`);
+    window.location.href = url.toString();
+  }
+
   return (
     <>
     <HashRouter>
         <Layout>
           <Routes>
-            <Route exact path="/*" element={<Login />} />
-            {/* <Route exact path="/home" element={<PrivateRoute key="home"><Home /></PrivateRoute>} /> */}
-            <Route exact path="/turnos" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
+   
+            <Route exact path="/*" element={<PrivateRoute key="turnos"><Turnos /></PrivateRoute>} />
             <Route exact path="/imprimirTurno" element={<PrivateRoute key="imprimirTurnos"><ImprimirTurno /></PrivateRoute>} />
-            <Route exact path="/registro" element={<Registro />} /> 
-
-            {/* <Route exact
-              path="/estadistica_rrhh"
-              element={
-                <PrivateRoute key="cap-humano">
-                  <CapitalHumano />
-                </PrivateRoute>
-              }
-            />
-            <Route exact
-              path="/estadistica_ac"
-              element={
-                <PrivateRoute key="reclamos">
-                  <Reclamos />
-                </PrivateRoute>
-              }
-            /> */}
-
-            <Route exact path="/perfil" element={
-            <PrivateRoute key="perfil"><Perfil /></PrivateRoute>
-            } />
-
-            {/* <Route exact path="/panel_admin" element={<PanelAdmin />} /> */}
 
           </Routes>
         </Layout>

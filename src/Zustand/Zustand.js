@@ -1,17 +1,13 @@
 import { create } from 'zustand';
 import axios from '../config/axios';
 
-const useStore = create((set) => ({
+const useStore = create((set,get) => ({
   errors: "",
   setErrors: (newValues) => set(() => ({ errors: newValues })),
 
   authenticated: false,
 
   user: null,
-
-  permisos: [],
-  
-  opciones: [],
 
   loading: true,
   
@@ -33,53 +29,24 @@ const useStore = create((set) => ({
         set({errors : error.response.data?.errors?.length > 0 ?  error.response.data.errors[0].msg : error.response?.data?.message? error.response?.data.message: error.message});
     }
     set({ botonState: false });
-  },
-
-  obtenerPermisos: async (idUsuario) => {
-    try {
-      set({ errors: "" });
-      const response = await axios.get(`/usuarios/permisos/${idUsuario}`);
-      const data = response.data.usuario;
-      set({ permisos: data });
-    } catch (error) {
-      let errorMessage = "Algo salió mal :(";
-      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-        errorMessage = error.response.data.errors[0].msg;
-      } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      set({ errors: errorMessage });
-    }
-  }
-  ,
-  obtenerOpciones: async () => {
-    try {
-      set({ errors: "" });
-      const response = await axios.get("/usuarios/opciones");
-      const data = response.data;
-      console.log(response.data)
-      set({ opciones: data });
-    } catch (error) {
-      let errorMessage = "Algo salió mal :(";
-      if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
-        errorMessage = error.response.data.errors[0].msg;
-      } else if (error.response && error.response.data && error.response.data.message) {
-        errorMessage = error.response.data.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      set({ errors: errorMessage });
-    }
   }
   ,
 
   logout:() => {
-    set({authenticated: false });
     localStorage.removeItem("token");
-    localStorage.removeItem("saveChanges");
+    localStorage.removeItem("tokenSet");
     // localStorage.removeItem("reparticion");
+    set({authenticated: false });
+    // REDIRECCION DESPUES DE CERRAR SESION
+    // const url = new URL(`https://smt.gob.ar/`);
+    // window.location.href = url.toString();
+
+    const url = new URL(`https://ciudaddigital.smt.gob.ar/`);
+    // const url = new URL(`http://localhost:5173/`);
+    url.searchParams.append("logout", true);
+    url.searchParams.append("destino", localStorage.getItem("origen"));
+    url.searchParams.append("rep", localStorage.getItem("reparticion"));
+    window.open(url.toString(), '_self');
   },
 
   getAuth: async () => {
@@ -97,6 +64,7 @@ const useStore = create((set) => ({
       });
     } catch (error) {
       set({ authenticated: false});
+      get().logout();
       localStorage.removeItem("token");
       console.log("error de auth");
       console.log(error)
@@ -104,30 +72,10 @@ const useStore = create((set) => ({
     set({ loading: false});
   },
 
-  resultSearch: [],
-  setResultSearch: (item) => set(() => ({ resultSearch: [item] })),
-
-  valuesGraficos: {
-    procedimiento: "",
-    desde: "",
-    hasta: "",
-  },
-  setValuesGraficos: (newValues) => set((state) => ({ ...state, valuesGraficos: { ...state.valuesGraficos, ...newValues } })),
-
-
-  valuesCapHumano: "",
-  // eslint-disable-next-line no-unused-vars
-  setValuesCapHumano: (newValues) => set((state) => ({ valuesCapHumano: newValues })),
-
-  formFlagReclamos: true,
-  setFormFlagReclamos: () => set((state) => ({ ...state, formFlagReclamos: !state.formFlagReclamos })),
-
-  flagCategoriasFuncionarios: false,
-  setFlagCategoriasFuncionarios: () => set((state) => ({ ...state, flagCategoriasFuncionarios: !state.flagCategoriasFuncionarios })),
-
   updateUser: (newUserData) => {
     set({ user: newUserData });
   },
+  
 }))
 
 export default useStore;

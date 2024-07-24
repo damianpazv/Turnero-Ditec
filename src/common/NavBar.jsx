@@ -34,7 +34,12 @@ export default function NavBar() {
   
   const goToPerfil = () => {
     setAnchorEl(null);
-    navigate("/perfil");
+    
+    const url = new URL(`https://perfil.smt.gob.ar/`);
+    url.searchParams.append("auth", localStorage.getItem("token"));
+    url.searchParams.append("origin", "turnos");
+    window.location.href = url.toString();
+
   };
 
   const handleLogout = () => {
@@ -85,8 +90,7 @@ export default function NavBar() {
                       open={Boolean(anchorEl)}
                       onClose={handleClose}
                     >
-                         <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem> 
-                         <MenuItem onClick={abrirModal2}>Cambiar clave</MenuItem> 
+                      <MenuItem onClick={goToPerfil}>Mi perfil</MenuItem>
                       <MenuItem onClick={handleLogout}>Cerrar Sesión</MenuItem>
                     </Menu>
                   </div>
