@@ -5,12 +5,19 @@ import { Box, CircularProgress } from "@mui/material";
 
 // eslint-disable-next-line react/prop-types
 const PrivateRoute = ({ children }) => {
-  const { getAuth, authenticated, loading } = useStore();
+  const { getAuth, authenticated, loading, logout } = useStore();
   
   useEffect(() => {
     getAuth();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);  
+  }, []);
+  
+  useEffect(() => {
+    if (!loading && !authenticated) {
+      logout();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, authenticated]);
 
   return loading ? (
     <Box sx={{ display: "flex" }}>
@@ -20,7 +27,9 @@ const PrivateRoute = ({ children }) => {
     children
   ) : (
     // <Navigate to="/login" />
-    <></>
+    // <></>
+    // logout()
+    null
   );
 };
 

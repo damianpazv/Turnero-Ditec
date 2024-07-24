@@ -37,11 +37,8 @@ const useStore = create((set,get) => ({
     localStorage.removeItem("tokenSet");
     // localStorage.removeItem("reparticion");
     set({authenticated: false });
-    // REDIRECCION DESPUES DE CERRAR SESION
-    // const url = new URL(`https://smt.gob.ar/`);
-    // window.location.href = url.toString();
 
-    const url = new URL(`https://ciudaddigital.smt.gob.ar/`);
+    const url = new URL(`https://ciudaddigital.smt.gob.ar/#/login`);
     // const url = new URL(`http://localhost:5173/`);
     url.searchParams.append("logout", true);
     url.searchParams.append("destino", localStorage.getItem("origen"));
@@ -49,13 +46,41 @@ const useStore = create((set,get) => ({
     window.open(url.toString(), '_self');
   },
 
+   logoutTotem:() => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("totem");
+
+    const url = new URL(`https://back.smt.gob.ar`);
+    // const url = new URL(`http://localhost:5173/`);
+    url.searchParams.append("logout", true);
+    window.open(url.toString(), '_self');
+},
+
   getAuth: async () => {
+
     try {
-      const token = localStorage.getItem("token");
+      const url = new URL(window.location.href);
+      const tokenURL = url.searchParams.get("auth");
+
+      url.searchParams.delete("auth");
+      url.searchParams.delete("rep");
+      history.replaceState(null, "", url.toString());
+
+      const token = tokenURL? tokenURL : localStorage.getItem("token");
       if (!token) {
-        set({ loading: false});
-        return set({authenticated:false})
+        set({ loading: false });
+        // return set({ authenticated: false });
+        set({ authenticated: false });
+        localStorage.removeItem("token");
+        return get().logout();
       }
+
+      // const totemURL = url.searchParams.get("totem");  
+      // if (!totemURL) {
+      //   localStorage.removeItem("totem");
+      //   return get().logoutTotem();
+      // }
+
       axios.defaults.headers.common["Authorization"] = token;
       const { data } = await axios.get("/usuarios/authStatus");
       set({user:data.usuarioSinContraseña});

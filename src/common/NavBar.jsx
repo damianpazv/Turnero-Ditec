@@ -13,7 +13,7 @@ import logoMuni from "../assets/Logo_SMT_neg_4.png";
 import { CambiarContraseña } from "../pages/Perfil/CambiarContraseña";
 
 export default function NavBar() {
-  const { getAuth, authenticated, logout, user } =
+  const { getAuth, authenticated, logout, user, logoutTotem } =
     useStore();
   const [anchorEl, setAnchorEl] = useState(null);
   const [modal2Abierto, setModal2Abierto] = useState(false);
@@ -43,9 +43,13 @@ export default function NavBar() {
   };
 
   const handleLogout = () => {
-    logout();
-    navigate("/");
-    setAnchorEl(null);
+    if(localStorage.getItem("totem")){
+      logoutTotem();
+    }else{
+      logout();
+      navigate("/");
+      setAnchorEl(null);
+    }
   };
   useEffect(() => {
     getAuth();
